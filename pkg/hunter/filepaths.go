@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/gookit/color"
-	reg "github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
+	"log"
 	"os"
 	"regexp"
 	"sync"
@@ -14,9 +14,7 @@ import (
 // Hunter holds the required fields to implement
 // the Hunting interface and utilize the hunter package
 type Hunter struct {
-	System   afero.Fs
-	Patterns []*regexp.Regexp
-	BasePath string
+	Config *Config
 }
 
 var _ Hunting = Hunter{}
@@ -28,16 +26,26 @@ type Hunting interface {
 }
 
 // NewHunter creates an instance of the Hunter type
-func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hunter {
-	return &Hunter{System: system, Patterns: patterns, BasePath: location}
+func NewHunter(c *Config) *Hunter {
+	if c == nil {
+		var config Config
+		return &Hunter{config.Default()}
+	}
+	if c.System == nil {
+		log.Fatal("Missing filesystem in Hunter Config")
+	}
+	if len(c.Patterns) <= 0 || c.Patterns == nil {
+		log.Fatal("Missing regex patterns in Hunter Config")
+	}
+	return &Hunter{c}
 }
 
 // Hunt walks over the filesystem at the configured path, looking for sensitive information
 // it implements the Inspect method over an entire directory
 func (h Hunter) Hunt() error {
 	var files []string
-	filter := afero.NewRegexpFs(h.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|xml|rb|md|markdown|y(am|m)l)`))
-	if err := afero.Walk(filter, h.BasePath, func(path string, info os.FileInfo, err error) error {
+	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|xml|rb|md|markdown|y(am|m)l)`))
+	if err := afero.Walk(filter, h.Config.BasePath, func(path string, info os.FileInfo, err error) error {
 		// Parse files for loot
 		if info.IsDir() {
 			return nil
@@ -49,7 +57,7 @@ func (h Hunter) Hunt() error {
 	}
 
 	for _, f := range files {
-		h.Inspect(f, h.System)
+		h.Inspect(f, h.Config.System)
 	}
 
 	return nil
@@ -58,7 +66,6 @@ func (h Hunter) Hunt() error {
 // Inspect digs into the provided file and concurrently scans it for
 // sensitive information
 func (h Hunter) Inspect(path string, fs afero.Fs) {
-	//foundLoot := false
 	// Print file found message
 	plus := color.Bold.Text("[+]")
 	hit := color.Cyan.Text("Scanning: ")
@@ -78,12 +85,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 
 	for w := 1; w <= 3; w++ {
 		wg.Add(1)
-		go matchPattern(jobs, results, wg, []*regexp.Regexp{
-			reg.CreditCardRegex,
-			reg.BtcAddressRegex,
-			reg.VISACreditCardRegex,
-			reg.GitRepoRegex,
-		})
+		go matchPattern(jobs, results, wg, h.Config.Patterns)
 	}
 
 	// Scan the file for sensitive info matches

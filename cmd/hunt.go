@@ -23,12 +23,9 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/mingrammer/commonregex"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"pillager/pkg/hunter"
-	"regexp"
 )
 
 // huntCmd represents the hunt command
@@ -37,8 +34,7 @@ var huntCmd = &cobra.Command{
 	Short: "Hunt inside the file system for valuable information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fs := afero.NewOsFs()
-		h := hunter.NewHunter(fs, []*regexp.Regexp{commonregex.CreditCardRegex}, args[0])
+		h := hunter.NewHunter(nil)
 		if err := h.Hunt(); err != nil {
 			log.Fatal(err.Error())
 		}
