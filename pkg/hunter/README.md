@@ -9,8 +9,10 @@ import "pillager/pkg/hunter"
 ## Index
 
 - [func CheckPath(fs afero.Fs, path string) string](<#func-checkpath>)
+- [type Config](<#type-config>)
+  - [func (h *Config) Default() *Config](<#func-config-default>)
 - [type Hunter](<#type-hunter>)
-  - [func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hunter](<#func-newhunter>)
+  - [func NewHunter(c *Config) *Hunter](<#func-newhunter>)
   - [func (h Hunter) Hunt() error](<#func-hunter-hunt>)
   - [func (h Hunter) Inspect(path string, fs afero.Fs)](<#func-hunter-inspect>)
 - [type Hunting](<#type-hunting>)
@@ -24,27 +26,45 @@ func CheckPath(fs afero.Fs, path string) string
 
 CheckPath checks if a filepath exists and returns it if so\, otherwise returns a default path
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L16-L20>)
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L11-L15>)
 
-Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
+Config takes all of the configurable parameters for a Hunter
 
 ```go
-type Hunter struct {
+type Config struct {
     System   afero.Fs
     Patterns []*regexp.Regexp
     BasePath string
 }
 ```
 
-### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L31>)
+### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L19>)
 
 ```go
-func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hunter
+func (h *Config) Default() *Config
+```
+
+Default loads the default configuration for the Hunter
+
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L16-L18>)
+
+Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
+
+```go
+type Hunter struct {
+    Config *Config
+}
+```
+
+### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L29>)
+
+```go
+func NewHunter(c *Config) *Hunter
 ```
 
 NewHunter creates an instance of the Hunter type
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L37>)
+### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L45>)
 
 ```go
 func (h Hunter) Hunt() error
@@ -52,7 +72,7 @@ func (h Hunter) Hunt() error
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information it implements the Inspect method over an entire directory
 
-### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L60>)
+### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L68>)
 
 ```go
 func (h Hunter) Inspect(path string, fs afero.Fs)
@@ -60,7 +80,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs)
 
 Inspect digs into the provided file and concurrently scans it for sensitive information
 
-## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L25-L28>)
+## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L23-L26>)
 
 Hunting is the primary API interface for the hunter package
 
