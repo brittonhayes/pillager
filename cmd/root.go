@@ -36,7 +36,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "pillager",
 	Short: "Pillage systems for sensitive information",
-	Long: color.Red.Text(`
+	Long: color.Cyan.Text(`
 	██▓███   ██▓ ██▓     ██▓    ▄▄▄        ▄████ ▓█████  ██▀███
 	▓██░  ██▒▓██▒▓██▒    ▓██▒   ▒████▄     ██▒ ▀█▒▓█   ▀ ▓██ ▒ ██▒
 	▓██░ ██▓▒▒██▒▒██░    ▒██░   ▒██  ▀█▄  ▒██░▄▄▄░▒███   ▓██ ░▄█ ▒

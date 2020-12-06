@@ -1,6 +1,6 @@
 # Pillager
 
-![Image](./images/brand_image.png)
+![Image](./images/brand_image_ice.png)
 
 ## Table of Contents
 
