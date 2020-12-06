@@ -1,0 +1,5 @@
+19e41fd7ad1ec967e8163e80c56f218dd3703077cb6311fd37ee55074bd77f70  pillager_v0.0.0-next_Darwin_x86_64.tar.gz
+73bc2c71ce13c981b3c57838b8ffb01b0a53732b0064704df9e834e0f9ed9b9f  pillager_v0.0.0-next_Windows_i386.tar.gz
+ae0a74d8b0339d0d32c73feb856794dd5c81c85eed8bb6e7cc1f5c1eaf47be92  pillager_v0.0.0-next_Windows_x86_64.tar.gz
+bbdc1ed0b5af7574c6806cc4e47dbcd92196a88deac0c596dbfab1b459caff99  pillager_v0.0.0-next_Linux_x86_64.tar.gz
+ed79217d77f1c4f6f47287f38fad5caa4c704014e2dbd8c8d224f76e1f1ad9db  pillager_v0.0.0-next_Linux_i386.tar.gz
