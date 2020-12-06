@@ -9,9 +9,11 @@ import (
 // Config takes all of the configurable
 // parameters for a Hunter
 type Config struct {
-	System   afero.Fs
-	Patterns []*regexp.Regexp
-	BasePath string
+	System     afero.Fs
+	Patterns   []*regexp.Regexp
+	BasePath   string
+	Monochrome bool
+	Verbose    bool
 }
 
 // Default loads the default configuration
@@ -26,6 +28,8 @@ func (h *Config) Default() *Config {
 			reg.VISACreditCardRegex,
 			reg.GitRepoRegex,
 		},
-		BasePath: CheckPath(fs, "."),
+		BasePath:   CheckPath(fs, "."),
+		Monochrome: false,
+		Verbose:    false,
 	}
 }

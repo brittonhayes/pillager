@@ -23,18 +23,40 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+	reg "github.com/mingrammer/commonregex"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"pillager/pkg/hunter"
+	"regexp"
+)
+
+var (
+	financial  bool
+	github     bool
+	telephone  bool
+	email      bool
+	address    bool
+	monochrome bool
+	verbose    bool
 )
 
 // huntCmd represents the hunt command
 var huntCmd = &cobra.Command{
 	Use:   "hunt",
-	Short: "Hunt inside the file system for valuable information",
+	Short: "Hunt for loot",
+	Long:  "Hunt inside the file system for valuable information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		h := hunter.NewHunter(nil)
+		c := hunter.Config{
+			System:     afero.NewOsFs(),
+			Patterns:   setPattern(),
+			BasePath:   args[0],
+			Monochrome: monochrome,
+			Verbose:    verbose,
+		}
+		h := hunter.NewHunter(&c)
 		if err := h.Hunt(); err != nil {
 			log.Fatal(err.Error())
 		}
@@ -43,4 +65,54 @@ var huntCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
+	huntCmd.Flags().BoolVarP(&financial, "financial", "f", false, "filter for financial information")
+	huntCmd.Flags().BoolVarP(&github, "github", "g", false, "filter for github information")
+	huntCmd.Flags().BoolVarP(&telephone, "telephone", "t", false, "filter for telephone information")
+	huntCmd.Flags().BoolVarP(&email, "email", "e", false, "filter for email information")
+	huntCmd.Flags().BoolVarP(&address, "address", "a", false, "filter for address information")
+	huntCmd.Flags().BoolVarP(&monochrome, "monochrome", "m", false, "toggle colorful output")
+	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
+}
+
+func setPattern() []*regexp.Regexp {
+	defaultPattern := []*regexp.Regexp{
+		reg.CreditCardRegex,
+		reg.SSNRegex,
+		reg.BtcAddressRegex,
+		reg.GitRepoRegex,
+		reg.PhonesWithExtsRegex,
+		regexp.MustCompile(`(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)`),
+	}
+
+	if financial {
+		fmt.Println("FILTER:\tFinancial")
+		filtered := append([]*regexp.Regexp{}, reg.BtcAddressRegex, reg.CreditCardRegex)
+		return filtered
+	}
+
+	if github {
+		fmt.Println("FILTER:\tGithub")
+		filtered := append([]*regexp.Regexp{}, reg.GitRepoRegex)
+		return filtered
+	}
+
+	if telephone {
+		fmt.Println("FILTER:\tTelephone")
+		filtered := append([]*regexp.Regexp{}, reg.PhonesWithExtsRegex)
+		return filtered
+	}
+
+	if email {
+		fmt.Println("FILTER:\tEmail")
+		filtered := append([]*regexp.Regexp{}, reg.EmailRegex)
+		return filtered
+	}
+
+	if address {
+		fmt.Println("FILTER:\tAddress")
+		filtered := append([]*regexp.Regexp{}, reg.StreetAddressRegex)
+		return filtered
+	}
+
+	return defaultPattern
 }

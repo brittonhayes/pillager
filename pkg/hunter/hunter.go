@@ -44,7 +44,7 @@ func NewHunter(c *Config) *Hunter {
 // it implements the Inspect method over an entire directory
 func (h Hunter) Hunt() error {
 	var files []string
-	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|xml|rb|md|markdown|y(am|m)l)`))
+	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|rb|md|markdown|y(am|m)l)`))
 	if err := afero.Walk(filter, h.Config.BasePath, func(path string, info os.FileInfo, err error) error {
 		// Parse files for loot
 		if info.IsDir() {
@@ -66,11 +66,20 @@ func (h Hunter) Hunt() error {
 // Inspect digs into the provided file and concurrently scans it for
 // sensitive information
 func (h Hunter) Inspect(path string, fs afero.Fs) {
-	// Print file found message
-	plus := color.Bold.Text("[+]")
-	hit := color.Cyan.Text("Scanning: ")
-	message := fmt.Sprintf("%s %s %s", plus, hit, path)
-	fmt.Println(message)
+	// TODO handle the monochrome toggle in a more flexible way
+	if h.Config.Verbose {
+		switch h.Config.Monochrome {
+		case false:
+			plus := color.Bold.Text("[+]")
+			hit := color.Cyan.Text("Scanning: ")
+			message := fmt.Sprintf("%s %s %s", plus, hit, path)
+			fmt.Println(message)
+		default:
+			message := fmt.Sprintf("[+] Scanning: %s", path)
+			fmt.Println(message)
+		}
+	}
+
 	// Dig into the files matching the pattern
 	f, err := fs.Open(path)
 	if err != nil {
@@ -83,7 +92,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 	results := make(chan string)
 	wg := new(sync.WaitGroup)
 
-	for w := 1; w <= 3; w++ {
+	for w := 1; w <= 10; w++ {
 		wg.Add(1)
 		go matchPattern(jobs, results, wg, h.Config.Patterns)
 	}
@@ -104,15 +113,23 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 	}()
 
 	total := 0
-	for v := range results {
-		total += 1
-		color.Cyan.Println("Loot:", v)
-	}
-
-	if total >= 1 {
-		color.Bold.Println("TOTAL:\t", total)
-	} else {
-		color.Red.Println("Nothing found")
+	switch h.Config.Monochrome {
+	case false:
+		for v := range results {
+			total += 1
+			color.Blue.Println(v)
+		}
+		if total >= 1 && h.Config.Verbose {
+			color.Bold.Println("TOTAL:\t", total)
+		}
+	default:
+		for v := range results {
+			total += 1
+			fmt.Println(v)
+		}
+		if total >= 1 && h.Config.Verbose {
+			fmt.Println("TOTAL:\t", total)
+		}
 	}
 }
 
@@ -124,7 +141,7 @@ func matchPattern(jobs <-chan string, results chan<- string, wg *sync.WaitGroup,
 	for j := range jobs {
 		for _, p := range pattern {
 			if p.MatchString(j) {
-				results <- j
+				results <- p.FindString(j)
 			}
 		}
 	}
