@@ -49,10 +49,11 @@ var huntCmd = &cobra.Command{
 	Long:  "Hunt inside the file system for valuable information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		fs := afero.NewOsFs()
 		c := hunter.Config{
-			System:     afero.NewOsFs(),
+			System:     fs,
 			Patterns:   setPattern(),
-			BasePath:   args[0],
+			BasePath:   hunter.CheckPath(fs, args[0]),
 			Monochrome: monochrome,
 			Verbose:    verbose,
 		}
@@ -81,7 +82,7 @@ func setPattern() []*regexp.Regexp {
 		reg.BtcAddressRegex,
 		reg.GitRepoRegex,
 		reg.PhonesWithExtsRegex,
-		regexp.MustCompile(`(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)`),
+		reg.EmailRegex,
 	}
 
 	if financial {
