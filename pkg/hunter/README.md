@@ -24,7 +24,9 @@ func CheckPath(fs afero.Fs, path string) string
 
 CheckPath checks if a filepath exists and returns it if so\, otherwise returns a default path
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L14-L18>)
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L16-L20>)
+
+Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
 
 ```go
 type Hunter struct {
@@ -34,7 +36,7 @@ type Hunter struct {
 }
 ```
 
-### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L29>)
+### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L31>)
 
 ```go
 func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hunter
@@ -42,7 +44,7 @@ func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hun
 
 NewHunter creates an instance of the Hunter type
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L35>)
+### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L37>)
 
 ```go
 func (h Hunter) Hunt() error
@@ -50,7 +52,7 @@ func (h Hunter) Hunt() error
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information it implements the Inspect method over an entire directory
 
-### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L58>)
+### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L60>)
 
 ```go
 func (h Hunter) Inspect(path string, fs afero.Fs)
@@ -58,7 +60,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs)
 
 Inspect digs into the provided file and concurrently scans it for sensitive information
 
-## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L23-L26>)
+## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L25-L28>)
 
 Hunting is the primary API interface for the hunter package
 
