@@ -6,7 +6,9 @@ import (
 	"os"
 )
 
-func (h Hunter) CheckPath(fs afero.Fs, path string) string {
+// CheckPath checks if a filepath exists and
+// returns it if so, otherwise returns a default path
+func CheckPath(fs afero.Fs, path string) string {
 	ok, err := afero.Exists(fs, path)
 	if err != nil {
 		log.Printf("ERROR: %s", err.Error())

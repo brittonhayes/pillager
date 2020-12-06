@@ -19,15 +19,10 @@ type Hunter struct {
 
 var _ Hunting = Hunter{}
 
+// Hunting is the primary API interface for the hunter package
 type Hunting interface {
 	Hunt() error
-	inspect(path string, fs afero.Fs)
-}
-
-var contentRegexes = []*regexp.Regexp{
-	reg.CreditCardRegex,
-	reg.VISACreditCardRegex,
-	reg.GitRepoRegex,
+	Inspect(path string, fs afero.Fs)
 }
 
 // NewHunter creates an instance of the Hunter type
@@ -35,9 +30,11 @@ func NewHunter(system afero.Fs, patterns []*regexp.Regexp, location string) *Hun
 	return &Hunter{System: system, Patterns: patterns, BasePath: location}
 }
 
+// Hunt walks over the filesystem at the configured path, looking for sensitive information
+// it implements the Inspect method over an entire directory
 func (h Hunter) Hunt() error {
 	var files []string
-	filter := afero.NewRegexpFs(h.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|xml|rb|md|markdown)`))
+	filter := afero.NewRegexpFs(h.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|xml|rb|md|markdown|y(am|m)l)`))
 	if err := afero.Walk(filter, h.BasePath, func(path string, info os.FileInfo, err error) error {
 		// Parse files for loot
 		if info.IsDir() {
@@ -50,13 +47,15 @@ func (h Hunter) Hunt() error {
 	}
 
 	for _, f := range files {
-		h.inspect(f, h.System)
+		h.Inspect(f, h.System)
 	}
 
 	return nil
 }
 
-func (h Hunter) inspect(path string, fs afero.Fs) {
+// Inspect digs into the provided file and concurrently scans it for
+// sensitive information
+func (h Hunter) Inspect(path string, fs afero.Fs) {
 	//foundLoot := false
 	// Print file found message
 	plus := color.Bold.Text("[+]")
@@ -113,6 +112,8 @@ func (h Hunter) inspect(path string, fs afero.Fs) {
 	}
 }
 
+// matchPattern accepts a channel of jobs and looks for pattern matches
+// in each of jobs
 func matchPattern(jobs <-chan string, results chan<- string, wg *sync.WaitGroup, pattern []*regexp.Regexp) {
 	// Mark task finished once done
 	defer wg.Done()

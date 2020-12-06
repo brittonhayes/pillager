@@ -1,0 +1,5 @@
+output: "{{.Dir}}/README.md"
+repository:
+  url: https://github.com/brittonhayes/pillager
+  defaultBranch: main
+  path: /
