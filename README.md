@@ -19,7 +19,7 @@ go get github.com/brittonhayes/pillager
 
 If you're looking for the binary, check the [bin](./bin) directory or latest release for the executable that matches your system
 
-### Usage
+## Usage
 
 To see all of the commands available with `pillager`
 
