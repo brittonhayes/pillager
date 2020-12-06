@@ -11,6 +11,8 @@ import (
 	"sync"
 )
 
+// Hunter holds the required fields to implement
+// the Hunting interface and utilize the hunter package
 type Hunter struct {
 	System   afero.Fs
 	Patterns []*regexp.Regexp
