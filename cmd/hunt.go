@@ -22,10 +22,12 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
-	"pillager/pkg/filepaths"
+	"pillager/pkg/hunter"
+	"regexp"
 )
 
 // huntCmd represents the hunt command
@@ -34,10 +36,10 @@ var huntCmd = &cobra.Command{
 	Short: "Hunt inside the file system for valuable information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		var FileSystem = afero.NewOsFs()
-		path := args[0]
-		if err := afero.Walk(FileSystem, path, filepaths.WalkFn); err != nil {
-			log.Panicln(err)
+		fs := afero.NewOsFs()
+		h := hunter.NewHunter(fs, []*regexp.Regexp{commonregex.CreditCardRegex}, args[0])
+		if err := h.Hunt(); err != nil {
+			log.Fatal(err.Error())
 		}
 	},
 }
