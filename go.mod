@@ -6,6 +6,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.15 // indirect
 	github.com/cheggaaa/pb/v3 v3.0.5 // indirect
 	github.com/fatih/color v1.10.0 // indirect
+	github.com/ghodss/yaml v1.0.0
 	github.com/gookit/color v1.3.2
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect

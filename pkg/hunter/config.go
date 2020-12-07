@@ -14,6 +14,7 @@ type Config struct {
 	BasePath   string
 	Monochrome bool
 	Verbose    bool
+	Format     Format
 }
 
 // Default loads the default configuration
@@ -31,5 +32,6 @@ func (h *Config) Default() *Config {
 		BasePath:   CheckPath(fs, "."),
 		Monochrome: false,
 		Verbose:    false,
+		Format:     JSONFormat,
 	}
 }

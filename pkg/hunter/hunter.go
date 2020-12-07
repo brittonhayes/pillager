@@ -3,7 +3,6 @@ package hunter
 import (
 	"bufio"
 	"fmt"
-	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"log"
 	"os"
@@ -15,6 +14,7 @@ import (
 // the Hunting interface and utilize the hunter package
 type Hunter struct {
 	Config *Config
+	Hound  *Hound
 }
 
 var _ Hunting = Hunter{}
@@ -29,7 +29,7 @@ type Hunting interface {
 func NewHunter(c *Config) *Hunter {
 	if c == nil {
 		var config Config
-		return &Hunter{config.Default()}
+		return &Hunter{config.Default(), NewHound(config.Default())}
 	}
 	if c.System == nil {
 		log.Fatal("Missing filesystem in Hunter Config")
@@ -37,13 +37,14 @@ func NewHunter(c *Config) *Hunter {
 	if len(c.Patterns) <= 0 || c.Patterns == nil {
 		log.Fatal("Missing regex patterns in Hunter Config")
 	}
-	return &Hunter{c}
+	return &Hunter{c, NewHound(c)}
 }
 
 // Hunt walks over the filesystem at the configured path, looking for sensitive information
 // it implements the Inspect method over an entire directory
 func (h Hunter) Hunt() error {
 	var files []string
+	h.Hound = NewHound(h.Config)
 	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|rb|md|markdown|y(am|m)l)`))
 	if err := afero.Walk(filter, h.Config.BasePath, func(path string, info os.FileInfo, err error) error {
 		// Parse files for loot
@@ -55,43 +56,36 @@ func (h Hunter) Hunt() error {
 	}); err != nil {
 		return err
 	}
-
 	for _, f := range files {
 		h.Inspect(f, h.Config.System)
 	}
-
 	return nil
 }
 
 // Inspect digs into the provided file and concurrently scans it for
 // sensitive information
 func (h Hunter) Inspect(path string, fs afero.Fs) {
-	// TODO handle the monochrome toggle in a more flexible way
-	if h.Config.Verbose {
-		switch h.Config.Monochrome {
-		case false:
-			plus := color.Bold.Text("[+]")
-			hit := color.Cyan.Text("Scanning: ")
-			message := fmt.Sprintf("%s %s %s", plus, hit, path)
-			fmt.Println(message)
-		default:
-			message := fmt.Sprintf("[+] Scanning: %s", path)
-			fmt.Println(message)
-		}
-	}
-
-	// Dig into the files matching the pattern
-	f, err := fs.Open(path)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
 
 	// Initialize channels and wait group
 	jobs := make(chan string)
 	results := make(chan string)
 	wg := new(sync.WaitGroup)
 
+	// Initialize finding to hold results and count
+	finding := Finding{
+		Loot:    nil,
+		Count:   0,
+		Message: "",
+		Path:    path,
+	}
+
+	// TODO handle the monochrome toggle in a more flexible way
+	// Dig into the files matching the pattern
+	f, err := fs.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
 	for w := 1; w <= 10; w++ {
 		wg.Add(1)
 		go matchPattern(jobs, results, wg, h.Config.Patterns)
@@ -112,25 +106,22 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 		close(results)
 	}()
 
-	total := 0
-	switch h.Config.Monochrome {
-	case false:
-		for v := range results {
-			total += 1
-			color.Blue.Println(v)
-		}
-		if total >= 1 && h.Config.Verbose {
-			color.Bold.Println("TOTAL:\t", total)
-		}
-	default:
-		for v := range results {
-			total += 1
-			fmt.Println(v)
-		}
-		if total >= 1 && h.Config.Verbose {
-			fmt.Println("TOTAL:\t", total)
+	if h.Config.Verbose {
+		finding.Message = fmt.Sprintf("[+] Scanning: %s", path)
+	}
+
+	var loot []string
+	for v := range results {
+		if v != "" {
+			finding.Count += 1
+			loot = append(loot, v)
 		}
 	}
+
+	// Fill findings slice with results and print into
+	// desired format
+	findings := append(h.Hound.Findings, Finding{finding.Count, finding.Message, finding.Path, loot})
+	h.Hound.Howl(findings)
 }
 
 // matchPattern accepts a channel of jobs and looks for pattern matches

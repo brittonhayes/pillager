@@ -29,3 +29,27 @@ changelog:
       - '^test:'
       - '^images:'
       - '^examples:'
+scoop:
+  # Template for the url which is determined by the given Token (github or gitlab)
+  url_template: "http://github.com/brittonhayes/pillager/releases/{{ .Tag }}/{{ .ArtifactName }}"
+
+  # Repository to push the app manifest to.
+  bucket:
+    owner: brittonhayes
+    name: pillager-scoop
+    token: ${{ secrets.GORELEASER_TOKEN }}
+
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+
+  # The project name and current git tag are used in the format string.
+  commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
+
+  # Your app's description.
+  # Default is empty.
+  description: "Pillage filesystems for sensitive information"
+
+  # Your app's license
+  # Default is empty.
+  license: MIT

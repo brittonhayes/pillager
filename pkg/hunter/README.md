@@ -8,15 +8,39 @@ import "pillager/pkg/hunter"
 
 ## Index
 
+- [Constants](<#constants>)
 - [func CheckPath(fs afero.Fs, path string) string](<#func-checkpath>)
+- [func RenderTemplate(w io.Writer, tpl string, f []Finding)](<#func-rendertemplate>)
 - [type Config](<#type-config>)
   - [func (h *Config) Default() *Config](<#func-config-default>)
+- [type Finding](<#type-finding>)
+- [type Format](<#type-format>)
+  - [func StringToFormat(s string) Format](<#func-stringtoformat>)
+  - [func (f Format) String() string](<#func-format-string>)
+- [type Hound](<#type-hound>)
+  - [func NewHound(c *Config) *Hound](<#func-newhound>)
+  - [func (h Hound) Howl(f []Finding)](<#func-hound-howl>)
 - [type Hunter](<#type-hunter>)
   - [func NewHunter(c *Config) *Hunter](<#func-newhunter>)
   - [func (h Hunter) Hunt() error](<#func-hunter-hunt>)
   - [func (h Hunter) Inspect(path string, fs afero.Fs)](<#func-hunter-inspect>)
 - [type Hunting](<#type-hunting>)
+- [type HuntingDog](<#type-huntingdog>)
 
+
+## Constants
+
+DefaultTemplate is the base template used to format a Finding into the custom output format
+
+```go
+const DefaultTemplate = `{{ range . -}}
+{{ if (ge .Count 1) -}}PATH: {{.Path}}
+COUNT: {{.Count}}
+{{ range .Loot -}}Loot: {{.}}
+{{end}}
+{{end}}
+{{- end}}`
+```
 
 ## func [CheckPath](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/helpers.go#L11>)
 
@@ -26,19 +50,30 @@ func CheckPath(fs afero.Fs, path string) string
 
 CheckPath checks if a filepath exists and returns it if so\, otherwise returns a default path
 
-## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L11-L15>)
+## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/template.go#L21>)
+
+```go
+func RenderTemplate(w io.Writer, tpl string, f []Finding)
+```
+
+RenderTemplate renders a Hound finding in a custom go template format to the provided writer
+
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L11-L18>)
 
 Config takes all of the configurable parameters for a Hunter
 
 ```go
 type Config struct {
-    System   afero.Fs
-    Patterns []*regexp.Regexp
-    BasePath string
+    System     afero.Fs
+    Patterns   []*regexp.Regexp
+    BasePath   string
+    Monochrome bool
+    Verbose    bool
+    Format     Format
 }
 ```
 
-### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L19>)
+### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L22>)
 
 ```go
 func (h *Config) Default() *Config
@@ -46,17 +81,86 @@ func (h *Config) Default() *Config
 
 Default loads the default configuration for the Hunter
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L16-L18>)
+## type [Finding](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L26-L31>)
+
+Finding houses the details of a hound's hunt
+
+```go
+type Finding struct {
+    Count   int      `json:"count,omitempty"`
+    Message string   `json:"message,omitempty"`
+    Path    string   `json:"path,omitempty"`
+    Loot    []string `json:"loot,omitempty"`
+}
+```
+
+## type [Format](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/format.go#L9>)
+
+```go
+type Format int
+```
+
+```go
+const (
+    JSONFormat Format = iota + 1
+    YAMLFormat
+    CustomFormat
+)
+```
+
+### func [StringToFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/helpers.go#L28>)
+
+```go
+func StringToFormat(s string) Format
+```
+
+StringToFormat takes in a string representation of the preferred output format and returns to enum equivalent
+
+### func \(Format\) [String](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/format.go#L11>)
+
+```go
+func (f Format) String() string
+```
+
+## type [Hound](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L20-L23>)
+
+A Hound performs the file inspection and returns the results
+
+```go
+type Hound struct {
+    Config   *Config
+    Findings []Finding `json:"findings"`
+}
+```
+
+### func [NewHound](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L34>)
+
+```go
+func NewHound(c *Config) *Hound
+```
+
+NewHound creates an instance of the Hound type
+
+### func \(Hound\) [Howl](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L50>)
+
+```go
+func (h Hound) Howl(f []Finding)
+```
+
+Howl prints out the Findings from the Hound in the preferred output format
+
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L15-L18>)
 
 Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
 
 ```go
 type Hunter struct {
     Config *Config
+    Hound  *Hound
 }
 ```
 
-### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L29>)
+### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L29>)
 
 ```go
 func NewHunter(c *Config) *Hunter
@@ -64,7 +168,7 @@ func NewHunter(c *Config) *Hunter
 
 NewHunter creates an instance of the Hunter type
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L45>)
+### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L45>)
 
 ```go
 func (h Hunter) Hunt() error
@@ -72,7 +176,7 @@ func (h Hunter) Hunt() error
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information it implements the Inspect method over an entire directory
 
-### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L68>)
+### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L67>)
 
 ```go
 func (h Hunter) Inspect(path string, fs afero.Fs)
@@ -80,7 +184,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs)
 
 Inspect digs into the provided file and concurrently scans it for sensitive information
 
-## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/filepaths.go#L23-L26>)
+## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L23-L26>)
 
 Hunting is the primary API interface for the hunter package
 
@@ -88,6 +192,16 @@ Hunting is the primary API interface for the hunter package
 type Hunting interface {
     Hunt() error
     Inspect(path string, fs afero.Fs)
+}
+```
+
+## type [HuntingDog](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L15-L17>)
+
+The HuntingDog interface defines the available methods for instances of the Hound type
+
+```go
+type HuntingDog interface {
+    Howl(f []Finding)
 }
 ```
 
