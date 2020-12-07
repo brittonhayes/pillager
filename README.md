@@ -29,9 +29,16 @@ go get github.com/brittonhayes/pillager
 
 #### Scoop (Windows)
 
-```powershell
+```shell
 scoop bucket add pillager https://github.com/brittonhayes/pillager-scoop.git
 scoop install pillager
+```
+
+### Homebrew (OSX/Linux)
+
+```shell script
+brew tap brittonhayes/homebrew-pillager
+brew install pillager
 ```
 
 If you're looking for a binary, check the latest releases for the executable that matches your system

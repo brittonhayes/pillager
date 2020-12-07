@@ -78,10 +78,6 @@ brews:
       name: goreleaserbot
       email: goreleaser@carlosbecker.com
 
-    # Caveats for the user of your binary.
-    # Default is empty.
-    caveats: "How to use this binary"
-
     # Your app's homepage.
     # Default is empty.
     homepage: "https://github.com/brittonhayes/pillager"
