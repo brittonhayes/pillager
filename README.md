@@ -19,12 +19,19 @@ Pillager is designed to provide a simple means of leveraging Go's strong concurr
 
 ## Installation
 
-### Command line
+### Go
 
 If you have Go setup on your system, you can install Pillager with `go get`
  
 ```shell script
 go get github.com/brittonhayes/pillager
+```
+
+#### Scoop (Windows)
+
+```powershell
+scoop bucket add pillager https://github.com/brittonhayes/pillager-scoop.git
+scoop install pillager
 ```
 
 If you're looking for a binary, check the latest releases for the executable that matches your system
