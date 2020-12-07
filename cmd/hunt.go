@@ -5,10 +5,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/brittonhayes/pillager/pkg/hunter"
 	reg "github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"pillager/pkg/hunter"
 	"regexp"
 )
 

@@ -3,8 +3,10 @@
 # hunter
 
 ```go
-import "pillager/pkg/hunter"
+import "github.com/brittonhayes/pillager/pkg/hunter"
 ```
+
+Package hunter contains the types\, methods\, and interfaces for the file hunting portion of pillager
 
 ## Index
 

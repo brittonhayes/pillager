@@ -2,7 +2,7 @@
 // Package main is the primary entrypoint to the CLI
 package main
 
-import "pillager/cmd"
+import "github.com/brittonhayes/pillager/cmd"
 
 func main() {
 	cmd.Execute()
