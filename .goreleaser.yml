@@ -37,7 +37,6 @@ scoop:
   bucket:
     owner: brittonhayes
     name: pillager-scoop
-    token: ${{ secrets.GORELEASER_TOKEN }}
 
   commit_author:
     name: goreleaserbot
