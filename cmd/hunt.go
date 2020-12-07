@@ -25,7 +25,7 @@ var (
 
 // huntCmd represents the hunt command
 var huntCmd = &cobra.Command{
-	Use:   "hunt",
+	Use:   "hunt [directory]",
 	Short: "Hunt for loot",
 	Long:  "Hunt inside the file system for valuable information",
 	Args:  cobra.MinimumNArgs(1),
