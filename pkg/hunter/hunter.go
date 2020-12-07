@@ -3,6 +3,7 @@ package hunter
 import (
 	"bufio"
 	"fmt"
+	reg "github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
 	"log"
 	"os"
@@ -136,4 +137,48 @@ func matchPattern(jobs <-chan string, results chan<- string, wg *sync.WaitGroup,
 			}
 		}
 	}
+}
+
+// FilterResults sets the patterns to hunt for based on provided filters
+func FilterResults(financial bool, github bool, telephone bool, email bool, address bool) []*regexp.Regexp {
+	defaultPattern := []*regexp.Regexp{
+		reg.CreditCardRegex,
+		reg.SSNRegex,
+		reg.BtcAddressRegex,
+		reg.GitRepoRegex,
+		reg.PhonesWithExtsRegex,
+		reg.EmailRegex,
+	}
+
+	if financial {
+		fmt.Println("FILTER:\tFinancial")
+		filtered := append([]*regexp.Regexp{}, reg.BtcAddressRegex, reg.CreditCardRegex)
+		return filtered
+	}
+
+	if github {
+		fmt.Println("FILTER:\tGithub")
+		filtered := append([]*regexp.Regexp{}, reg.GitRepoRegex)
+		return filtered
+	}
+
+	if telephone {
+		fmt.Println("FILTER:\tTelephone")
+		filtered := append([]*regexp.Regexp{}, reg.PhonesWithExtsRegex)
+		return filtered
+	}
+
+	if email {
+		fmt.Println("FILTER:\tEmail")
+		filtered := append([]*regexp.Regexp{}, reg.EmailRegex)
+		return filtered
+	}
+
+	if address {
+		fmt.Println("FILTER:\tAddress")
+		filtered := append([]*regexp.Regexp{}, reg.StreetAddressRegex)
+		return filtered
+	}
+
+	return defaultPattern
 }

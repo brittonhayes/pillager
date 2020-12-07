@@ -4,12 +4,9 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/brittonhayes/pillager/pkg/hunter"
-	reg "github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"regexp"
 )
 
 var (
@@ -49,7 +46,7 @@ func StartHunt() func(cmd *cobra.Command, args []string) error {
 		fs := afero.NewOsFs()
 		c := hunter.Config{
 			System:     fs,
-			Patterns:   setPattern(),
+			Patterns:   hunter.FilterResults(financial, github, telephone, email, address),
 			BasePath:   hunter.CheckPath(fs, args[0]),
 			Monochrome: monochrome,
 			Verbose:    verbose,
@@ -62,48 +59,4 @@ func StartHunt() func(cmd *cobra.Command, args []string) error {
 		}
 		return nil
 	}
-}
-
-// setPattern sets the patterns to hunt for based on provided filters
-func setPattern() []*regexp.Regexp {
-	defaultPattern := []*regexp.Regexp{
-		reg.CreditCardRegex,
-		reg.SSNRegex,
-		reg.BtcAddressRegex,
-		reg.GitRepoRegex,
-		reg.PhonesWithExtsRegex,
-		reg.EmailRegex,
-	}
-
-	if financial {
-		fmt.Println("FILTER:\tFinancial")
-		filtered := append([]*regexp.Regexp{}, reg.BtcAddressRegex, reg.CreditCardRegex)
-		return filtered
-	}
-
-	if github {
-		fmt.Println("FILTER:\tGithub")
-		filtered := append([]*regexp.Regexp{}, reg.GitRepoRegex)
-		return filtered
-	}
-
-	if telephone {
-		fmt.Println("FILTER:\tTelephone")
-		filtered := append([]*regexp.Regexp{}, reg.PhonesWithExtsRegex)
-		return filtered
-	}
-
-	if email {
-		fmt.Println("FILTER:\tEmail")
-		filtered := append([]*regexp.Regexp{}, reg.EmailRegex)
-		return filtered
-	}
-
-	if address {
-		fmt.Println("FILTER:\tAddress")
-		filtered := append([]*regexp.Regexp{}, reg.StreetAddressRegex)
-		return filtered
-	}
-
-	return defaultPattern
 }

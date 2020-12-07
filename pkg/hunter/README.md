@@ -12,6 +12,7 @@ Package hunter contains the types\, methods\, and interfaces for the file huntin
 
 - [Constants](<#constants>)
 - [func CheckPath(fs afero.Fs, path string) string](<#func-checkpath>)
+- [func FilterResults(financial bool, github bool, telephone bool, email bool, address bool) []*regexp.Regexp](<#func-filterresults>)
 - [func RenderTemplate(w io.Writer, tpl string, f []Finding)](<#func-rendertemplate>)
 - [type Config](<#type-config>)
   - [func (h *Config) Default() *Config](<#func-config-default>)
@@ -51,6 +52,14 @@ func CheckPath(fs afero.Fs, path string) string
 ```
 
 CheckPath checks if a filepath exists and returns it if so\, otherwise returns a default path
+
+## func [FilterResults](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L143>)
+
+```go
+func FilterResults(financial bool, github bool, telephone bool, email bool, address bool) []*regexp.Regexp
+```
+
+FilterResults sets the patterns to hunt for based on provided filters
 
 ## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/template.go#L21>)
 
@@ -151,7 +160,7 @@ func (h Hound) Howl(f []Finding)
 
 Howl prints out the Findings from the Hound in the preferred output format
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L15-L18>)
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L16-L19>)
 
 Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
 
@@ -162,7 +171,7 @@ type Hunter struct {
 }
 ```
 
-### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L29>)
+### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L30>)
 
 ```go
 func NewHunter(c *Config) *Hunter
@@ -170,7 +179,7 @@ func NewHunter(c *Config) *Hunter
 
 NewHunter creates an instance of the Hunter type
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L45>)
+### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L46>)
 
 ```go
 func (h Hunter) Hunt() error
@@ -178,7 +187,7 @@ func (h Hunter) Hunt() error
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information it implements the Inspect method over an entire directory
 
-### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L67>)
+### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L68>)
 
 ```go
 func (h Hunter) Inspect(path string, fs afero.Fs)
@@ -186,7 +195,40 @@ func (h Hunter) Inspect(path string, fs afero.Fs)
 
 Inspect digs into the provided file and concurrently scans it for sensitive information
 
-## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L23-L26>)
+<details><summary>Example</summary>
+<p>
+
+```go
+{
+	fs := afero.NewMemMapFs()
+	f, err := fs.Create("example.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	_, err = f.Write([]byte(`example@email.com`))
+	if err != nil {
+		panic(err)
+	}
+
+	c := Config{
+		System:     fs,
+		Patterns:   []*regexp.Regexp{reg.EmailRegex},
+		BasePath:   CheckPath(fs, "."),
+		Monochrome: false,
+		Verbose:    true,
+		Format:     StringToFormat("yaml"),
+	}
+	h := NewHunter(&c)
+	h.Inspect(f.Name(), h.Config.System)
+}
+```
+
+</p>
+</details>
+
+## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L24-L27>)
 
 Hunting is the primary API interface for the hunter package
 

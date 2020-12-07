@@ -52,3 +52,42 @@ scoop:
   # Your app's license
   # Default is empty.
   license: MIT
+
+brews:
+  -
+    # Name template of the recipe
+    # Default to project name
+    name: pillager
+
+    # GOARM to specify which 32-bit arm version to use if there are multiple versions
+    # from the build section. Brew formulas support atm only one 32-bit version.
+    # Default is 6 for all artifacts or each id if there a multiple versions.
+    goarm: 6
+
+    # GitHub/GitLab repository to push the formula to
+    # Gitea is not supported yet, but the support coming
+    tap:
+      owner: brittonhayes
+      name: homebrew-pillager
+
+    url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+
+    # Caveats for the user of your binary.
+    # Default is empty.
+    caveats: "How to use this binary"
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://github.com/brittonhayes/pillager"
+
+    # Your app's description.
+    # Default is empty.
+    description: "Pillage filesystems for sensitive information"
+
+    license: "MIT"

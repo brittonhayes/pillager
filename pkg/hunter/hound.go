@@ -50,19 +50,19 @@ func NewHound(c *Config) *Hound {
 func (h Hound) Howl(f []Finding) {
 	switch h.Config.Format {
 	case JSONFormat:
-		b, err := json.MarshalIndent(f, "", "  ")
+		b, err := json.Marshal(&f)
 		if err != nil {
 			log.Fatal("Failed to unmarshal findings")
 		}
 		fmt.Println(string(b))
 	case YAMLFormat:
-		b, err := yaml.Marshal(f)
+		b, err := yaml.Marshal(&f)
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 			return
 		}
 		fmt.Println(string(b))
 	case CustomFormat:
-		RenderTemplate(os.Stderr, DefaultTemplate, f)
+		RenderTemplate(os.Stdout, DefaultTemplate, f)
 	}
 }
