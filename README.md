@@ -27,7 +27,7 @@ If you have Go setup on your system, you can install Pillager with `go get`
 go get github.com/brittonhayes/pillager
 ```
 
-#### Scoop (Windows)
+### Scoop (Windows)
 
 ```shell
 scoop bucket add pillager https://github.com/brittonhayes/pillager-scoop.git
