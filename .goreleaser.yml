@@ -31,7 +31,7 @@ changelog:
       - '^examples:'
 scoop:
   # Template for the url which is determined by the given Token (github or gitlab)
-  url_template: "http://github.com/brittonhayes/pillager/releases/{{ .Tag }}/{{ .ArtifactName }}"
+  url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
   # Repository to push the app manifest to.
   bucket:
