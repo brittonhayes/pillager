@@ -151,31 +151,26 @@ func FilterResults(financial bool, github bool, telephone bool, email bool, addr
 	}
 
 	if financial {
-		fmt.Println("FILTER:\tFinancial")
 		filtered := append([]*regexp.Regexp{}, reg.BtcAddressRegex, reg.CreditCardRegex)
 		return filtered
 	}
 
 	if github {
-		fmt.Println("FILTER:\tGithub")
 		filtered := append([]*regexp.Regexp{}, reg.GitRepoRegex)
 		return filtered
 	}
 
 	if telephone {
-		fmt.Println("FILTER:\tTelephone")
 		filtered := append([]*regexp.Regexp{}, reg.PhonesWithExtsRegex)
 		return filtered
 	}
 
 	if email {
-		fmt.Println("FILTER:\tEmail")
 		filtered := append([]*regexp.Regexp{}, reg.EmailRegex)
 		return filtered
 	}
 
 	if address {
-		fmt.Println("FILTER:\tAddress")
 		filtered := append([]*regexp.Regexp{}, reg.StreetAddressRegex)
 		return filtered
 	}
