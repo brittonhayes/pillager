@@ -35,9 +35,6 @@ func NewHunter(c *Config) *Hunter {
 	if c.System == nil {
 		log.Fatal("Missing filesystem in Hunter Config")
 	}
-	if len(c.Patterns) <= 0 || c.Patterns == nil {
-		log.Fatal("Missing regex patterns in Hunter Config")
-	}
 	return &Hunter{c, NewHound(c)}
 }
 
@@ -46,12 +43,13 @@ func NewHunter(c *Config) *Hunter {
 func (h Hunter) Hunt() error {
 	var files []string
 	h.Hound = NewHound(h.Config)
-	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(go|rtf|txt|csv|js|php|java|json|rb|md|markdown|y(am|m)l)`))
+	filter := afero.NewRegexpFs(h.Config.System, regexp.MustCompile(`(?i).*\.(json|y(am|m)l|toml|env|bash_history|(zsh|fish|bash)rc|ini)`))
 	if err := afero.Walk(filter, h.Config.BasePath, func(path string, info os.FileInfo, err error) error {
 		// Parse files for loot
 		if info.IsDir() {
 			return nil
 		}
+
 		files = append(files, path)
 		return nil
 	}); err != nil {
@@ -89,7 +87,7 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 	defer f.Close()
 	for w := 1; w <= 10; w++ {
 		wg.Add(1)
-		go matchPattern(jobs, results, wg, h.Config.Patterns)
+		go h.matchPattern(jobs, results, wg)
 	}
 
 	// Scan the file for sensitive info matches
@@ -121,40 +119,28 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 
 	// Fill findings slice with results and print into
 	// desired format
-	findings := append(h.Hound.Findings, Finding{finding.Count, finding.Message, finding.Path, loot})
-	h.Hound.Howl(findings)
+	if finding.Count > 0 {
+		h.Hound.Findings = append(h.Hound.Findings, Finding{finding.Count, finding.Message, finding.Path, loot})
+		h.Hound.Fetch()
+	}
 }
 
 // matchPattern accepts a channel of jobs and looks for pattern matches
 // in each of jobs
-func matchPattern(jobs <-chan string, results chan<- string, wg *sync.WaitGroup, pattern []*regexp.Regexp) {
+func (h *Hunter) matchPattern(jobs <-chan string, results chan<- string, wg *sync.WaitGroup) {
 	// Mark task finished once done
 	defer wg.Done()
 	for j := range jobs {
-		for _, p := range pattern {
-			if p.MatchString(j) {
-				results <- p.FindString(j)
+		for _, r := range h.Config.Rules {
+			if r.Regex.MatchString(j) {
+				results <- r.Regex.FindString(j)
 			}
 		}
 	}
 }
 
 // FilterResults sets the patterns to hunt for based on provided filters
-func FilterResults(financial bool, github bool, telephone bool, email bool, address bool) []*regexp.Regexp {
-	defaultPattern := []*regexp.Regexp{
-		reg.CreditCardRegex,
-		reg.SSNRegex,
-		reg.BtcAddressRegex,
-		reg.GitRepoRegex,
-		reg.PhonesWithExtsRegex,
-		reg.EmailRegex,
-	}
-
-	if financial {
-		filtered := append([]*regexp.Regexp{}, reg.BtcAddressRegex, reg.CreditCardRegex)
-		return filtered
-	}
-
+func FilterResults(github bool, telephone bool, email bool) []*regexp.Regexp {
 	if github {
 		filtered := append([]*regexp.Regexp{}, reg.GitRepoRegex)
 		return filtered
@@ -170,10 +156,5 @@ func FilterResults(financial bool, github bool, telephone bool, email bool, addr
 		return filtered
 	}
 
-	if address {
-		filtered := append([]*regexp.Regexp{}, reg.StreetAddressRegex)
-		return filtered
-	}
-
-	return defaultPattern
+	return DefaultPatterns
 }

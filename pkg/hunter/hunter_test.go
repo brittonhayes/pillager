@@ -1,9 +1,7 @@
 package hunter
 
 import (
-	reg "github.com/mingrammer/commonregex"
 	"github.com/spf13/afero"
-	"regexp"
 )
 
 // This is an example of how to run a scan on a single file to look for
@@ -11,7 +9,7 @@ import (
 // but this supports using an actual file system as well.
 func ExampleHunter_Inspect_email() {
 	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.txt")
+	f, err := fs.Create("example.toml")
 	if err != nil {
 		panic(err)
 	}
@@ -23,12 +21,11 @@ func ExampleHunter_Inspect_email() {
 	}
 
 	c := Config{
-		System:     fs,
-		Patterns:   []*regexp.Regexp{reg.EmailRegex},
-		BasePath:   CheckPath(fs, "."),
-		Monochrome: false,
-		Verbose:    true,
-		Format:     StringToFormat("yaml"),
+		System:   fs,
+		BasePath: CheckPath(fs, "."),
+		Verbose:  true,
+		Format:   StringToFormat("yaml"),
+		Rules:    LoadRules(""),
 	}
 	h := NewHunter(&c)
 	h.Inspect(f.Name(), h.Config.System)
@@ -36,8 +33,8 @@ func ExampleHunter_Inspect_email() {
 	// - count: 1
 	//   loot:
 	//   - example@email.com
-	//   message: '[+] Scanning: example.txt'
-	//   path: example.txt
+	//   message: '[+] Scanning: example.toml'
+	//   path: example.toml
 }
 
 // This method also accepts custom output formats using
@@ -45,7 +42,7 @@ func ExampleHunter_Inspect_email() {
 // you can format to your heart's content.
 func ExampleHunter_Inspect_custom_output() {
 	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.txt")
+	f, err := fs.Create("example.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -57,12 +54,10 @@ func ExampleHunter_Inspect_custom_output() {
 	}
 
 	c := Config{
-		System:     fs,
-		Patterns:   FilterResults(false, false, false, false, false),
-		BasePath:   CheckPath(fs, "."),
-		Monochrome: false,
-		Verbose:    true,
-		Format:     StringToFormat("custom"),
+		System:   fs,
+		BasePath: ".",
+		Verbose:  true,
+		Format:   CustomFormat,
 	}
 	h := NewHunter(&c)
 	h.Inspect(f.Name(), h.Config.System)
@@ -72,27 +67,49 @@ func ExampleHunter_Inspect_custom_output() {
 // as well
 func ExampleHunter_Inspect_json() {
 	fs := afero.NewMemMapFs()
-	f, err := fs.Create("fake.txt")
+	f, err := fs.Create("fake.json")
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-
 	_, err = f.Write([]byte(`git@github.com:brittonhayes/pillager.git`))
 	if err != nil {
 		panic(err)
 	}
 
-	c := Config{
-		System:     fs,
-		Patterns:   FilterResults(false, false, false, false, false),
-		BasePath:   CheckPath(fs, "."),
-		Monochrome: false,
-		Verbose:    true,
-		Format:     StringToFormat("json"),
-	}
-	h := NewHunter(&c)
+	h := NewHunter(&Config{
+		System:   fs,
+		BasePath: ".",
+		Verbose:  true,
+		Format:   JSONFormat,
+		Rules:    LoadRules(""),
+	})
 	h.Inspect(f.Name(), h.Config.System)
 	// output:
-	// [{"count":2,"message":"[+] Scanning: fake.txt","path":"fake.txt","loot":["git@github.com:brittonhayes/pillager.git","git@github.com"]}]
+	// [{"count":2,"message":"[+] Scanning: fake.json","path":"fake.json","loot":["git@github.com","git@github.com:brittonhayes/pillager.git"]}]
+}
+
+// Hunter will also look personally identifiable info in TOML
+func ExampleHunter_Inspect_toml() {
+	fs := afero.NewMemMapFs()
+	f, err := fs.Create("fake.toml")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	_, err = f.Write([]byte(`fakeperson@example.com`))
+	if err != nil {
+		panic(err)
+	}
+
+	h := NewHunter(&Config{
+		System:   fs,
+		Rules:    LoadRules(""),
+		BasePath: CheckPath(fs, "."),
+		Verbose:  true,
+		Format:   JSONFormat,
+	})
+	h.Inspect(f.Name(), h.Config.System)
+	// output:
+	// [{"count":1,"message":"[+] Scanning: fake.toml","path":"fake.toml","loot":["fakeperson@example.com"]}]
 }

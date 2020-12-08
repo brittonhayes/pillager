@@ -41,7 +41,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pillager.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pillager.toml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -59,6 +59,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".pillager" (without extension).
 		viper.AddConfigPath(home)
+		viper.SetConfigType("toml")
 		viper.SetConfigName(".pillager")
 	}
 

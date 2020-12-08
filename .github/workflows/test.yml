@@ -1,0 +1,15 @@
+name: test
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: go test -v ./...
