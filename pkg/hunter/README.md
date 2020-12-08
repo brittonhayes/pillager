@@ -11,19 +11,23 @@ Package hunter contains the types\, methods\, and interfaces for the file huntin
 ## Index
 
 - [Constants](<#constants>)
+- [Variables](<#variables>)
 - [func CheckPath(fs afero.Fs, path string) string](<#func-checkpath>)
 - [func FilterResults(github bool, telephone bool, email bool) []*regexp.Regexp](<#func-filterresults>)
+- [func LoadRules(filepath string) []gitleaks.Rule](<#func-loadrules>)
 - [func RenderTemplate(w io.Writer, tpl string, f []Finding)](<#func-rendertemplate>)
 - [type Config](<#type-config>)
-  - [func (h *Config) Default() *Config](<#func-config-default>)
+  - [func (c *Config) Default() *Config](<#func-config-default>)
 - [type Finding](<#type-finding>)
+- [type Findings](<#type-findings>)
+  - [func (ss Findings) Filter(condition func(Finding) bool) (ss2 Findings)](<#func-findings-filter>)
 - [type Format](<#type-format>)
   - [func StringToFormat(s string) Format](<#func-stringtoformat>)
   - [func (f Format) String() string](<#func-format-string>)
 - [type Hound](<#type-hound>)
   - [func NewHound(c *Config) *Hound](<#func-newhound>)
-  - [func (h Hound) Clean() []Finding](<#func-hound-clean>)
   - [func (h Hound) Fetch()](<#func-hound-fetch>)
+  - [func (h *Hound) FilterEmpty() *Hound](<#func-hound-filterempty>)
 - [type Hunter](<#type-hunter>)
   - [func NewHunter(c *Config) *Hunter](<#func-newhunter>)
   - [func (h Hunter) Hunt() error](<#func-hunter-hunt>)
@@ -46,6 +50,15 @@ COUNT: {{.Count}}
 {{- end}}`
 ```
 
+## Variables
+
+```go
+var DefaultPatterns = []*regexp.Regexp{
+    reg.EmailRegex,
+    reg.GitRepoRegex,
+}
+```
+
 ## func [CheckPath](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/helpers.go#L11>)
 
 ```go
@@ -62,6 +75,12 @@ func FilterResults(github bool, telephone bool, email bool) []*regexp.Regexp
 
 FilterResults sets the patterns to hunt for based on provided filters
 
+## func [LoadRules](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L41>)
+
+```go
+func LoadRules(filepath string) []gitleaks.Rule
+```
+
 ## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/template.go#L21>)
 
 ```go
@@ -70,29 +89,29 @@ func RenderTemplate(w io.Writer, tpl string, f []Finding)
 
 RenderTemplate renders a Hound finding in a custom go template format to the provided writer
 
-## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L11-L17>)
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L20-L26>)
 
 Config takes all of the configurable parameters for a Hunter
 
 ```go
 type Config struct {
     System   afero.Fs
-    Patterns []*regexp.Regexp
     BasePath string
     Verbose  bool
+    Rules    []gitleaks.Rule
     Format   Format
 }
 ```
 
-### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L21>)
+### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L30>)
 
 ```go
-func (h *Config) Default() *Config
+func (c *Config) Default() *Config
 ```
 
 Default loads the default configuration for the Hunter
 
-## type [Finding](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L29-L34>)
+## type [Finding](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L32-L37>)
 
 Finding houses the details of a hound's hunt
 
@@ -104,6 +123,24 @@ type Finding struct {
     Loot    []string `json:"loot,omitempty"`
 }
 ```
+
+## type [Findings](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L29>)
+
+Findings contains a slice of Finding
+
+```go
+type Findings []Finding
+```
+
+### func \(Findings\) [Filter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/findings_pie.go#L7>)
+
+```go
+func (ss Findings) Filter(condition func(Finding) bool) (ss2 Findings)
+```
+
+Filter will return a new slice containing only the elements that return true from the condition\. The returned slice may contain zero elements \(nil\)\.
+
+FilterNot works in the opposite way of Filter\.
 
 ## type [Format](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/format.go#L9>)
 
@@ -140,23 +177,17 @@ A Hound performs the file inspection and returns the results
 ```go
 type Hound struct {
     Config   *Config
-    Findings []Finding `json:"findings"`
+    Findings Findings `json:"findings"`
 }
 ```
 
-### func [NewHound](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L37>)
+### func [NewHound](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L40>)
 
 ```go
 func NewHound(c *Config) *Hound
 ```
 
 NewHound creates an instance of the Hound type
-
-### func \(Hound\) [Clean](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L73>)
-
-```go
-func (h Hound) Clean() []Finding
-```
 
 ### func \(Hound\) [Fetch](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L53>)
 
@@ -174,16 +205,16 @@ Here is an example of utilizing the Howl function on a slice of findings\. The H
 ```go
 {
 	h := NewHound(&Config{
-		System:   afero.NewMemMapFs(),
-		Patterns: []*regexp.Regexp{reg.EmailRegex},
-		Format:   JSONFormat,
+		System: afero.NewMemMapFs(),
+		Rules:  LoadRules(""),
+		Format: JSONFormat,
 	})
 	h.Findings = []Finding{
 		{
 			Count:   1,
 			Message: "Found something juicy",
 			Path:    "example.toml",
-			Loot:    []string{"1234560"},
+			Loot:    []string{"Token 1234560"},
 		},
 	}
 	h.Fetch()
@@ -194,11 +225,17 @@ Here is an example of utilizing the Howl function on a slice of findings\. The H
 #### Output
 
 ```
-[{"count":1,"message":"Found something juicy","path":"example.toml","loot":["1234560"]}]
+[{"count":1,"message":"Found something juicy","path":"example.toml","loot":["Token 1234560"]}]
 ```
 
 </p>
 </details>
+
+### func \(\*Hound\) [FilterEmpty](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hound.go#L73>)
+
+```go
+func (h *Hound) FilterEmpty() *Hound
+```
 
 ## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L16-L19>)
 
@@ -219,7 +256,7 @@ func NewHunter(c *Config) *Hunter
 
 NewHunter creates an instance of the Hunter type
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L46>)
+### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L43>)
 
 ```go
 func (h Hunter) Hunt() error
@@ -227,7 +264,7 @@ func (h Hunter) Hunt() error
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information it implements the Inspect method over an entire directory
 
-### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L68>)
+### func \(Hunter\) [Inspect](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L66>)
 
 ```go
 func (h Hunter) Inspect(path string, fs afero.Fs)
@@ -243,7 +280,7 @@ This method also accepts custom output formats using go template/html\. So if yo
 ```go
 {
 	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.key")
+	f, err := fs.Create("example.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -256,10 +293,9 @@ This method also accepts custom output formats using go template/html\. So if yo
 
 	c := Config{
 		System:   fs,
-		Patterns: FilterResults(false, false, false),
-		BasePath: CheckPath(fs, "."),
+		BasePath: ".",
 		Verbose:  true,
-		Format:   StringToFormat("custom"),
+		Format:   CustomFormat,
 	}
 	h := NewHunter(&c)
 	h.Inspect(f.Name(), h.Config.System)
@@ -277,7 +313,7 @@ This is an example of how to run a scan on a single file to look for email addre
 ```go
 {
 	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.key")
+	f, err := fs.Create("example.toml")
 	if err != nil {
 		panic(err)
 	}
@@ -290,10 +326,10 @@ This is an example of how to run a scan on a single file to look for email addre
 
 	c := Config{
 		System:   fs,
-		Patterns: []*regexp.Regexp{reg.EmailRegex},
 		BasePath: CheckPath(fs, "."),
 		Verbose:  true,
 		Format:   StringToFormat("yaml"),
+		Rules:    LoadRules(""),
 	}
 	h := NewHunter(&c)
 	h.Inspect(f.Name(), h.Config.System)
@@ -307,8 +343,8 @@ This is an example of how to run a scan on a single file to look for email addre
 - count: 1
   loot:
   - example@email.com
-  message: '[+] Scanning: example.key'
-  path: example.key
+  message: '[+] Scanning: example.toml'
+  path: example.toml
 ```
 
 </p>
@@ -334,10 +370,10 @@ This method accepts json output format as well
 
 	h := NewHunter(&Config{
 		System:   fs,
-		Patterns: FilterResults(false, false, false),
-		BasePath: CheckPath(fs, "."),
+		BasePath: ".",
 		Verbose:  true,
-		Format:   StringToFormat("json"),
+		Format:   JSONFormat,
+		Rules:    LoadRules(""),
 	})
 	h.Inspect(f.Name(), h.Config.System)
 
@@ -347,7 +383,46 @@ This method accepts json output format as well
 #### Output
 
 ```
-[{"count":2,"message":"[+] Scanning: fake.json","path":"fake.json","loot":["git@github.com:brittonhayes/pillager.git","git@github.com"]}]
+[{"count":2,"message":"[+] Scanning: fake.json","path":"fake.json","loot":["git@github.com","git@github.com:brittonhayes/pillager.git"]}]
+```
+
+</p>
+</details>
+
+<details><summary>Example</summary>
+<p>
+
+Hunter will also look personally identifiable info in TOML
+
+```go
+{
+	fs := afero.NewMemMapFs()
+	f, err := fs.Create("fake.toml")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	_, err = f.Write([]byte(`fakeperson@example.com`))
+	if err != nil {
+		panic(err)
+	}
+
+	h := NewHunter(&Config{
+		System:   fs,
+		Rules:    LoadRules(""),
+		BasePath: CheckPath(fs, "."),
+		Verbose:  true,
+		Format:   JSONFormat,
+	})
+	h.Inspect(f.Name(), h.Config.System)
+
+}
+```
+
+#### Output
+
+```
+[{"count":1,"message":"[+] Scanning: fake.toml","path":"fake.toml","loot":["fakeperson@example.com"]}]
 ```
 
 </p>
@@ -370,7 +445,7 @@ The Retriever interface defines the available methods for instances of the Hound
 
 ```go
 type Retriever interface {
-    Clean() []Finding
+    FilterEmpty() *Hound
     Fetch()
 }
 ```
