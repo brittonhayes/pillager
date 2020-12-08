@@ -55,15 +55,37 @@ pillager
 pillager [cmd] --help
 ```
 
+## Configuration
+
+### Gitleaks Rules
+
+Pillager provides full support for [Gitleaks](https://github.com/zricethezav/gitleaks) rules. This can either be passed in with a [rules.toml](./rules.toml) file, or you can use the default ruleset by leaving the rules flag blank. 
+
+> Currently entropy is not implemented, but it is absolutely planned to add support for Gitleaks' entropy configs in future updates.
+
+```toml
+# rules.toml
+title = "pillager rules"
+[[rules]]
+description = "AWS Access Key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["key", "AWS"]
+[[rules]]
+description = "Email Address"
+regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
+tags = ["email", "User Info"]
+```
+
 ## Documentation
 
 :books: [View the docs](./pkg/hunter)
 
-GoDoc documentation is also available for all packages in the [./pkg](./pkg) directory. Just open the folder of any package and you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
+GoDoc documentation is available on [pkg.go.dev for pillager](https://pkg.go.dev/github.com/brittonhayes/pillager) but it also available for all packages in the [./pkg](./pkg) directory. 
+Just open the folder of any package and you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
 
 ---
 
-### Shoulders of Giants
+### Shoulders of Giants :star:
 
 #### [afero's regexpFs](https://github.com/spf13/afero#regexpfs). 
 
@@ -80,6 +102,19 @@ This is important because it limits the number of files being scanned in the fir
 > Cobra is a library providing a simple interface to create powerful modern CLI interfaces similar to git & go tools. Cobra is also an application that will generate your application scaffolding to rapidly develop a Cobra-based application.
 
 If you've seen a CLI written in Go before, there's a pretty high chance it was built with Cobra. I can't recommend this library enough. It empowers developers to make consistent, dynamic, and self-documenting command line tools with ease. Some examples include `kubectl`, `hugo`, and Github's `gh` CLI.
+
+#### [Gitleaks](https://github.com/zricethezav/gitleaks)
+
+**What is Gitleaks?**
+
+> Gitleaks is a SAST tool for detecting hardcoded secrets like passwords, api keys, and tokens in git repos.
+
+Gitleaks is an amazing tool for secret leak prevention. If you haven't implemented Gitleaks as a pre-commit checker, it's worth your time to check it out. 
+
+**Why is Gitleaks relevant to Pillager?**
+
+Pillager implements the powerful [rules](https://github.com/zricethezav/gitleaks#rules-summary) functionality of Gitleaks while taking a more offensive approach to working with the secrets found. 
+While I have provided a baseline set of default rules, Pillager becomes much more powerful if you allow users to create rules for their own use-cases.
 
 ---
 
