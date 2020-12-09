@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 	"sync"
 )
 
@@ -66,7 +67,7 @@ func (h Hunter) Hunt() error {
 func (h Hunter) Inspect(path string, fs afero.Fs) {
 
 	// Initialize channels and wait group
-	jobs := make(chan string)
+	jobs := make(chan string, 100)
 	results := make(chan string)
 	wg := new(sync.WaitGroup)
 
@@ -84,8 +85,9 @@ func (h Hunter) Inspect(path string, fs afero.Fs) {
 	if err != nil {
 		panic(err)
 	}
+
 	defer f.Close()
-	for w := 1; w <= 10; w++ {
+	for w := 1; w <= runtime.NumCPU(); w++ {
 		wg.Add(1)
 		go h.matchPattern(jobs, results, wg)
 	}
