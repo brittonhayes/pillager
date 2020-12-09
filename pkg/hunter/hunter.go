@@ -67,7 +67,7 @@ func (h Hunter) Hunt() error {
 func (h Hunter) Inspect(path string, fs afero.Fs) {
 
 	// Initialize channels and wait group
-	jobs := make(chan string, 100)
+	jobs := make(chan string)
 	results := make(chan string)
 	wg := new(sync.WaitGroup)
 
