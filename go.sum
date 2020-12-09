@@ -256,8 +256,8 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1
 github.com/xanzy/ssh-agent v0.2.1 h1:TCbipTQL2JiiCprBWx9frJ2eJlCYT00NmctrHxVAr70=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
-github.com/zricethezav/gitleaks/v7 v7.0.2 h1:qHSee1+ksfyV5mvHygIYBn8+SaO/Zp+nwp0XiamcwBs=
-github.com/zricethezav/gitleaks/v7 v7.0.2/go.mod h1:DfDkqhZapIizuVTe17nXLfUU0ZTzdhI75n2ml+lS/Qw=
+github.com/zricethezav/gitleaks/v7 v7.1.0 h1:iFZRpuS6OeelNM1IU9JrFqwry390utoBnOYq8ZBNz6M=
+github.com/zricethezav/gitleaks/v7 v7.1.0/go.mod h1:ocVVcnu9aakEm/HSXheH82gPm0BR+XeOUM4CFuwIgrc=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
