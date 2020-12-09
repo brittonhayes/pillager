@@ -14,5 +14,7 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: go get ./...
       - name: Run benchmarks
         run: go test -bench . -benchmem ./...
