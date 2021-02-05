@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0
-	github.com/gookit/color v1.3.6
+	github.com/gookit/color v1.3.7
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mingrammer/commonregex v1.0.1
 	github.com/mitchellh/go-homedir v1.1.0
