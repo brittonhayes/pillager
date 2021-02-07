@@ -82,6 +82,30 @@ regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9
 tags = ["email", "User Info"]
 ```
 
+### Custom Templates
+
+Pillager allows you to use powerful `go text/template` to customize the output format. Here are a few template examples.
+
+#### Basic
+```gotemplate
+{{/*basic.tmpl*/}}
+{{ range .Leaks}}
+    Leak: {{.Line}}
+    Line: {{.LineNumber}}
+    File: {{ .File }}
+{{end}}
+```
+
+#### Markdown Styling
+```gotemplate
+{{/*markdown.tmpl*/}}
+# Results
+{{ range .Leaks}}
+    ## {{ .File }}
+    - Location: {{.LineNumber}}
+{{end}}
+```
+
 ## Documentation
 
 :books: [View the docs](hunter)
