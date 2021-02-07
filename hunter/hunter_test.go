@@ -1,13 +1,14 @@
 package hunter
 
 import (
+	"github.com/brittonhayes/pillager/rules"
 	"github.com/spf13/afero"
 )
 
 // This is an example of how to run a scan on a single file to look for
 // email addresses. We're using an in-memory file system for simplicity,
 // but this supports using an actual file system as well.
-func ExampleHunter_Inspect_email() {
+func ExampleHunter_Hunt_email() {
 	fs := afero.NewMemMapFs()
 	f, err := fs.Create("example.toml")
 	if err != nil {
@@ -20,27 +21,15 @@ func ExampleHunter_Inspect_email() {
 		panic(err)
 	}
 
-	c := Config{
-		System:   fs,
-		BasePath: CheckPath(fs, "."),
-		Verbose:  true,
-		Format:   StringToFormat("yaml"),
-		Rules:    LoadRules(""),
-	}
-	h := NewHunter(&c)
-	h.Inspect(f.Name(), h.Config.System)
-	// output:
-	// - count: 1
-	//   loot:
-	//   - example@email.com
-	//   message: '[+] Scanning: example.toml'
-	//   path: example.toml
+	config := NewConfig(fs, "./", true, rules.Load(""), StringToFormat("yaml"), DefaultTemplate)
+	h := NewHunter(config)
+	_ = h.Hunt()
 }
 
 // This method also accepts custom output formats using
 // go template/html. So if you don't like yaml or json,
 // you can format to your heart's content.
-func ExampleHunter_Inspect_custom_output() {
+func ExampleHunter_Hunt_custom_output() {
 	fs := afero.NewMemMapFs()
 	f, err := fs.Create("example.yaml")
 	if err != nil {
@@ -53,19 +42,14 @@ func ExampleHunter_Inspect_custom_output() {
 		panic(err)
 	}
 
-	c := Config{
-		System:   fs,
-		BasePath: ".",
-		Verbose:  true,
-		Format:   CustomFormat,
-	}
-	h := NewHunter(&c)
-	h.Inspect(f.Name(), h.Config.System)
+	config := NewConfig(fs, "./", true, rules.Load(""), CustomFormat, DefaultTemplate)
+	h := NewHunter(config)
+	_ = h.Hunt()
 }
 
 // This method accepts json output format
 // as well
-func ExampleHunter_Inspect_json() {
+func ExampleHunter_Hunt_json() {
 	fs := afero.NewMemMapFs()
 	f, err := fs.Create("fake.json")
 	if err != nil {
@@ -77,20 +61,13 @@ func ExampleHunter_Inspect_json() {
 		panic(err)
 	}
 
-	h := NewHunter(&Config{
-		System:   fs,
-		BasePath: ".",
-		Verbose:  true,
-		Format:   JSONFormat,
-		Rules:    LoadRules(""),
-	})
-	h.Inspect(f.Name(), h.Config.System)
-	// output:
-	// [{"count":2,"message":"[+] Scanning: fake.json","path":"fake.json","loot":["git@github.com","git@github.com:brittonhayes/pillager.git"]}]
+	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate)
+	h := NewHunter(config)
+	_ = h.Hunt()
 }
 
 // Hunter will also look personally identifiable info in TOML
-func ExampleHunter_Inspect_toml() {
+func ExampleHunter_Hunt_toml() {
 	fs := afero.NewMemMapFs()
 	f, err := fs.Create("fake.toml")
 	if err != nil {
@@ -102,14 +79,8 @@ func ExampleHunter_Inspect_toml() {
 		panic(err)
 	}
 
-	h := NewHunter(&Config{
-		System:   fs,
-		Rules:    LoadRules(""),
-		BasePath: CheckPath(fs, "."),
-		Verbose:  true,
-		Format:   JSONFormat,
-	})
-	h.Inspect(f.Name(), h.Config.System)
-	// output:
-	// [{"count":1,"message":"[+] Scanning: fake.toml","path":"fake.toml","loot":["fakeperson@example.com"]}]
+	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate)
+
+	h := NewHunter(config)
+	_ = h.Hunt()
 }

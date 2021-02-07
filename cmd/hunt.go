@@ -4,7 +4,8 @@
 package cmd
 
 import (
-	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/hunter"
+	"github.com/brittonhayes/pillager/rules"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -13,6 +14,7 @@ var (
 	verbose     bool
 	rulesConfig string
 	output      string
+	templ       string
 )
 
 // huntCmd represents the hunt command
@@ -20,32 +22,48 @@ var huntCmd = &cobra.Command{
 	Use:   "hunt [directory]",
 	Short: "Hunt for loot",
 	Long:  "Hunt inside the file system for valuable information",
-	Args:  cobra.MinimumNArgs(1),
-	RunE:  StartHunt(),
+	Example: `
+# Run a basic hunt
+pillager hunt ./
+
+# Print out results in JSON format
+pillager hunt ./example -r rules.toml -f json
+
+# Print out results with a custom inline template
+pillager hunt ./example -r rules.toml -f custom --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+
+# Print out results with a custom template file
+pillager hunt ./example -r rules.toml -f custom --template "$(cat templates/simple.tmpl)"
+`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: StartHunt(),
 }
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
-	huntCmd.Flags().StringVarP(&rulesConfig, "rules-config", "r", "", "path to gitleaks rules config")
-	huntCmd.Flags().StringVarP(&output, "output", "o", "yaml", "set output format (json, yaml)")
+	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
+	huntCmd.Flags().StringVarP(&output, "format", "f", "yaml", "set output format (json, yaml, custom)")
+	huntCmd.Flags().StringVarP(
+		&templ,
+		"template",
+		"t",
+		hunter.DefaultTemplate,
+		"set go text/template string for output format",
+	)
 }
 
 func StartHunt() func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		fs := afero.NewOsFs()
-		c := hunter.Config{
-			System:   fs,
-			BasePath: hunter.CheckPath(fs, args[0]),
-			Verbose:  verbose,
-			Format:   hunter.StringToFormat(output),
-			Rules:    hunter.LoadRules(rulesConfig),
-		}
-		h := hunter.NewHunter(&c)
-		err := h.Hunt()
-		if err != nil {
-			return err
-		}
-		return nil
+		c := hunter.NewConfig(
+			afero.NewOsFs(),
+			args[0],
+			verbose,
+			rules.Load(rulesConfig),
+			hunter.StringToFormat(output),
+			templ,
+		)
+		h := hunter.NewHunter(c)
+		return h.Hunt()
 	}
 }

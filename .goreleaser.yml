@@ -28,7 +28,7 @@ changelog:
       - '^docs:'
       - '^test:'
       - '^images:'
-      - '^examples:'
+      - '^_examples:'
 scoop:
   # Template for the url which is determined by the given Token (github or gitlab)
   url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
