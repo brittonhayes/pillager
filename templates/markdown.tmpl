@@ -1,6 +1,6 @@
 {{/*markdown.tmpl*/}}
 # Results
-{{ range .Leaks}}
+{{ range .Leaks -}}
     ## {{ .File }}
     - Location: {{.LineNumber}}
 {{end}}

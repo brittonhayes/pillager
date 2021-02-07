@@ -13,7 +13,15 @@ Package hunter contains the types\, methods\, and interfaces for the file huntin
 - [Constants](<#constants>)
 - [func RenderTemplate(w io.Writer, tpl string, f scan.Report)](<#func-rendertemplate>)
 - [type Config](<#type-config>)
-  - [func NewConfig(fs afero.Fs, path string, verbose bool, rules []gitleaks.Rule, format Format, template string) *Config](<#func-newconfig>)
+  - [func NewConfig(
+    fs afero.Fs,
+    path string,
+    verbose bool,
+    rules []gitleaks.Rule,
+    format Format,
+    template string,
+    workers int,
+) *Config](<#func-newconfig>)
   - [func (c *Config) Default() *Config](<#func-config-default>)
   - [func (c *Config) Validate() (err error)](<#func-config-validate>)
 - [type Configer](<#type-configer>)
@@ -51,7 +59,7 @@ func RenderTemplate(w io.Writer, tpl string, f scan.Report)
 
 RenderTemplate renders a Hound finding in a custom go template format to the provided writer
 
-## type [Config](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L16-L23>)
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L16-L24>)
 
 Config takes all of the configurable parameters for a Hunter
 
@@ -60,21 +68,30 @@ type Config struct {
     System   afero.Fs
     BasePath string
     Verbose  bool
+    Workers  int
     Rules    []gitleaks.Rule
     Format   Format
     Template string
 }
 ```
 
-### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L31>)
+### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L32-L40>)
 
 ```go
-func NewConfig(fs afero.Fs, path string, verbose bool, rules []gitleaks.Rule, format Format, template string) *Config
+func NewConfig(
+    fs afero.Fs,
+    path string,
+    verbose bool,
+    rules []gitleaks.Rule,
+    format Format,
+    template string,
+    workers int,
+) *Config
 ```
 
 NewConfig generates a new config for the Hunter
 
-### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L45>)
+### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L55>)
 
 ```go
 func (c *Config) Default() *Config
@@ -82,13 +99,13 @@ func (c *Config) Default() *Config
 
 Default loads the default configuration for the Hunter
 
-### func \(\*Config\) [Validate](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L58>)
+### func \(\*Config\) [Validate](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L68>)
 
 ```go
 func (c *Config) Validate() (err error)
 ```
 
-## type [Configer](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L25-L28>)
+## type [Configer](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L26-L29>)
 
 ```go
 type Configer interface {
@@ -233,7 +250,7 @@ This method also accepts custom output formats using go template/html\. So if yo
 		panic(err)
 	}
 
-	config := NewConfig(fs, "./", true, rules.Load(""), CustomFormat, DefaultTemplate)
+	config := NewConfig(fs, "./", true, rules.Load(""), CustomFormat, DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -261,7 +278,7 @@ This is an example of how to run a scan on a single file to look for email addre
 		panic(err)
 	}
 
-	config := NewConfig(fs, "./", true, rules.Load(""), StringToFormat("yaml"), DefaultTemplate)
+	config := NewConfig(fs, "./", true, rules.Load(""), StringToFormat("yaml"), DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -288,7 +305,7 @@ This method accepts json output format as well
 		panic(err)
 	}
 
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate)
+	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -315,7 +332,7 @@ Hunter will also look personally identifiable info in TOML
 		panic(err)
 	}
 
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate)
+	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
 
 	h := NewHunter(config)
 	_ = h.Hunt()
