@@ -17,6 +17,7 @@ type Config struct {
 	System   afero.Fs
 	BasePath string
 	Verbose  bool
+	Workers  int
 	Rules    []gitleaks.Rule
 	Format   Format
 	Template string
@@ -28,7 +29,15 @@ type Configer interface {
 }
 
 // NewConfig generates a new config for the Hunter
-func NewConfig(fs afero.Fs, path string, verbose bool, rules []gitleaks.Rule, format Format, template string) *Config {
+func NewConfig(
+	fs afero.Fs,
+	path string,
+	verbose bool,
+	rules []gitleaks.Rule,
+	format Format,
+	template string,
+	workers int,
+) *Config {
 	p := validate.New().Path(fs, path)
 	return &Config{
 		System:   fs,
@@ -37,6 +46,7 @@ func NewConfig(fs afero.Fs, path string, verbose bool, rules []gitleaks.Rule, fo
 		Rules:    rules,
 		Format:   format,
 		Template: template,
+		Workers:  workers,
 	}
 }
 

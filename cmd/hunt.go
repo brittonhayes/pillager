@@ -15,6 +15,7 @@ var (
 	rulesConfig string
 	output      string
 	templ       string
+	workers     int
 )
 
 // huntCmd represents the hunt command
@@ -41,6 +42,7 @@ pillager hunt ./example -r rules.toml -f custom --template "$(cat templates/simp
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
+	huntCmd.Flags().IntVarP(&workers, "workers", "w", 5, "number of concurrent workers to create")
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
 	huntCmd.Flags().StringVarP(&output, "format", "f", "yaml", "set output format (json, yaml, custom)")
@@ -62,6 +64,7 @@ func StartHunt() func(cmd *cobra.Command, args []string) error {
 			rules.Load(rulesConfig),
 			hunter.StringToFormat(output),
 			templ,
+			workers,
 		)
 		h := hunter.NewHunter(c)
 		return h.Hunt()

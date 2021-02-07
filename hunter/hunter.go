@@ -48,10 +48,11 @@ func (h Hunter) Hunt() error {
 
 	opt := options.Options{Path: h.Config.BasePath, Verbose: h.Config.Verbose}
 	conf := config.Config{Rules: h.Config.Rules}
+
 	scanner := scan.NewNoGitScanner(opt, conf)
 	report, err := scanner.Scan()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	h.Hound.Howl(report)
