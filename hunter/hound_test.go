@@ -1,28 +1,26 @@
 package hunter
 
 import (
+	"github.com/brittonhayes/pillager/rules"
 	"github.com/spf13/afero"
+	"github.com/zricethezav/gitleaks/v7/scan"
 )
 
 // Here is an example of utilizing the Howl function
 // on a slice of findings. The Howl method is the final
 // method in the hunting process. It takes whatever
 // has been found and outputs it for the user.
-func ExampleHound_Fetch_json() {
+func ExampleHound_Howl_json() {
 	h := NewHound(&Config{
 		System: afero.NewMemMapFs(),
-		Rules:  LoadRules(""),
+		Rules:  rules.Load(""),
 		Format: JSONFormat,
 	})
-	h.Findings = []Finding{
-		{
-			Count:   1,
-			Message: "Found something juicy",
-			Path:    "example.toml",
-			Loot:    []string{"Token 1234560"},
+	findings := scan.Report{
+		Leaks: []scan.Leak{
+			{Line: "person@email.com", LineNumber: 16, Offender: "person@email.com", Rule: "Email Addresses"},
 		},
 	}
-	h.Fetch()
-	// output:
-	// [{"count":1,"message":"Found something juicy","path":"example.toml","loot":["Token 1234560"]}]
+
+	h.Howl(findings)
 }

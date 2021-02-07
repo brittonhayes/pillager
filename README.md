@@ -63,15 +63,19 @@ pillager [cmd] --help
 
 Pillager provides full support for [Gitleaks](https://github.com/zricethezav/gitleaks) rules. This can either be passed in with a [rules.toml](./rules.toml) file, or you can use the default ruleset by leaving the rules flag blank. 
 
-> Currently entropy is not implemented, but it is absolutely planned to add support for Gitleaks' entropy configs in future updates.
-
 ```toml
 # rules.toml
 title = "pillager rules"
+
 [[rules]]
 description = "AWS Access Key"
 regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
 tags = ["key", "AWS"]
+[[rules.entropies]]
+    Min = "3.5"
+    Max = "4.5"
+    Group = "1"
+
 [[rules]]
 description = "Email Address"
 regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
@@ -80,22 +84,14 @@ tags = ["email", "User Info"]
 
 ## Documentation
 
-:books: [View the docs](./pkg/hunter)
+:books: [View the docs](hunter)
 
 GoDoc documentation is available on [pkg.go.dev for pillager](https://pkg.go.dev/github.com/brittonhayes/pillager) but it also available for all packages in the [./pkg](./pkg) directory. 
-Just open the folder of any package and you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
+Just open the folder of any package, and you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
 
 ---
 
 ### Shoulders of Giants :star:
-
-#### [afero's regexpFs](https://github.com/spf13/afero#regexpfs). 
-
-**What is RegexpFs?**
-
-> A filtered view on file names, any file NOT matching the provided patterns will be treated as non-existing.
-
-This is important because it limits the number of files being scanned in the first place, thus cutting down on the time to finish the scan. In other words, we probably don't want to attempt to scan a `*.mp4` from top to bottom, but we definitely _do_ want to scan a `*.env` from top to bottom.
 
 #### [afero's Cobra](https://github.com/spf13/cobra)
 
