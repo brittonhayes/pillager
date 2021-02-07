@@ -13,14 +13,6 @@ title = "pillager config"
 	regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
 	tags = ["key", "AWS"]
 [[rules]]
-description = "Email Address"
-regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
-tags = ["email", "User Info"]
-[[rules]]
-description = "Github Repository"
-regex = '''((git|ssh|http(s)?)|(git@[\w\.]+))(:(\/\/)?)([\w\.@\:/\-~]+)(\.git)(\/)?'''
-tags = ["repo", "Github"]
-[[rules]]
 	description = "Github"
 	regex = '''(?i)github(.{0,20})?(?-i)[0-9a-zA-Z]{35,40}'''
 	tags = ["key", "Github"]
@@ -33,11 +25,13 @@ tags = ["repo", "Github"]
 	regex = '''-----BEGIN ((EC|PGP|DSA|RSA|OPENSSH) )?PRIVATE KEY( BLOCK)?-----'''
 	tags = ["key", "AsymmetricPrivateKey"]
 [[rules]]
-	description = "Google (GCP) Service Account"
-	regex = '''"type": "service_account"'''
-	tags = ["key", "Google"]
-[[rules]]
 	description = "Slack Webhook"
 	regex = '''https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}'''
 	tags = ["key", "slack"]
+
+[allowlist]
+	description = "Allowlisted files"
+	files = ['''^\.?gitleaks.toml$''',
+	'''(.*?)(png|jpg|gif|doc|docx|pdf|bin|xls|pyc|zip)$''',
+	'''(go.mod|go.sum)$''']
 `

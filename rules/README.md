@@ -9,7 +9,7 @@ import "github.com/brittonhayes/pillager/rules"
 ## Index
 
 - [Constants](<#constants>)
-- [func Load(filepath string) []gitleaks.Rule](<#func-load>)
+- [func Load(filepath string) gitleaks.Config](<#func-load>)
 
 
 ## Constants
@@ -28,14 +28,6 @@ title = "pillager config"
 	regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
 	tags = ["key", "AWS"]
 [[rules]]
-description = "Email Address"
-regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
-tags = ["email", "User Info"]
-[[rules]]
-description = "Github Repository"
-regex = '''((git|ssh|http(s)?)|(git@[\w\.]+))(:(\/\/)?)([\w\.@\:/\-~]+)(\.git)(\/)?'''
-tags = ["repo", "Github"]
-[[rules]]
 	description = "Github"
 	regex = '''(?i)github(.{0,20})?(?-i)[0-9a-zA-Z]{35,40}'''
 	tags = ["key", "Github"]
@@ -48,10 +40,6 @@ tags = ["repo", "Github"]
 	regex = '''-----BEGIN ((EC|PGP|DSA|RSA|OPENSSH) )?PRIVATE KEY( BLOCK)?-----'''
 	tags = ["key", "AsymmetricPrivateKey"]
 [[rules]]
-	description = "Google (GCP) Service Account"
-	regex = '''"type": "service_account"'''
-	tags = ["key", "Google"]
-[[rules]]
 	description = "Slack Webhook"
 	regex = '''https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}'''
 	tags = ["key", "slack"]
@@ -61,7 +49,7 @@ tags = ["repo", "Github"]
 ## func [Load](<https://github.com/brittonhayes/pillager/blob/main/rules/rules.go#L11>)
 
 ```go
-func Load(filepath string) []gitleaks.Rule
+func Load(filepath string) gitleaks.Config
 ```
 
 Load loads the config file into an array of gitleaks rules

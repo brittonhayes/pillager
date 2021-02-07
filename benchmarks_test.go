@@ -23,9 +23,9 @@ func BenchmarkHunterLoadRules(b *testing.B) {
 func BenchmarkHunterHoundHowl(b *testing.B) {
 	b.StopTimer()
 	h := hunter.NewHound(&hunter.Config{
-		System: afero.NewMemMapFs(),
-		Rules:  rules.Load(""),
-		Format: hunter.JSONFormat,
+		System:   afero.NewMemMapFs(),
+		Gitleaks: rules.Load(""),
+		Format:   hunter.JSONFormat,
 	})
 	findings := scan.Report{
 		Leaks: []scan.Leak{

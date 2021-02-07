@@ -18,7 +18,7 @@ type Config struct {
 	BasePath string
 	Verbose  bool
 	Workers  int
-	Rules    []gitleaks.Rule
+	Gitleaks gitleaks.Config
 	Format   Format
 	Template string
 }
@@ -29,21 +29,13 @@ type Configer interface {
 }
 
 // NewConfig generates a new config for the Hunter
-func NewConfig(
-	fs afero.Fs,
-	path string,
-	verbose bool,
-	rules []gitleaks.Rule,
-	format Format,
-	template string,
-	workers int,
-) *Config {
+func NewConfig(fs afero.Fs, path string, verbose bool, gitleaks gitleaks.Config, format Format, template string, workers int) *Config {
 	p := validate.New().Path(fs, path)
 	return &Config{
 		System:   fs,
 		BasePath: p,
 		Verbose:  verbose,
-		Rules:    rules,
+		Gitleaks: gitleaks,
 		Format:   format,
 		Template: template,
 		Workers:  workers,
@@ -60,7 +52,7 @@ func (c *Config) Default() *Config {
 		BasePath: v.Path(fs, "."),
 		Verbose:  false,
 		Template: DefaultTemplate,
-		Rules:    rules.Load(""),
+		Gitleaks: rules.Load(""),
 		Format:   JSONFormat,
 	}
 }
@@ -70,8 +62,8 @@ func (c *Config) Validate() (err error) {
 		err = fmt.Errorf("missing filesystem in Hunter Config")
 	}
 
-	if c.Rules == nil {
-		err = fmt.Errorf("no rules provided")
+	if c.Gitleaks.Rules == nil {
+		err = fmt.Errorf("no gitleaks config provided")
 	}
 	return
 }
