@@ -8,7 +8,7 @@ on:
 jobs:
   benchmark:
     name: Run benchmarks
-    runs-on: ${{ matrix.validate }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
