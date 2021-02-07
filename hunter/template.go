@@ -11,8 +11,9 @@ import (
 // DefaultTemplate is the base template used to
 // format a Finding into the custom output format
 const DefaultTemplate = `{{ with . -}}
-{{ range .Leaks -}}Loot: {{.LineNumber}}
-{{ .File }}
+{{ range .Leaks -}}Line: {{.LineNumber}}
+File: {{ .File }}
+Offender: {{ .Offender }}
 
 {{end}}
 {{- end}}`

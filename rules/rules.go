@@ -8,7 +8,7 @@ import (
 )
 
 // Load loads the config file into an array of gitleaks rules
-func Load(filepath string) []gitleaks.Rule {
+func Load(filepath string) gitleaks.Config {
 	var (
 		config gitleaks.TomlLoader
 		err    error
@@ -28,5 +28,5 @@ func Load(filepath string) []gitleaks.Rule {
 		log.Fatal("Failed to parse in toml config")
 	}
 
-	return c.Rules
+	return c
 }

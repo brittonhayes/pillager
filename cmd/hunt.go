@@ -4,6 +4,8 @@
 package cmd
 
 import (
+	"runtime"
+
 	"github.com/brittonhayes/pillager/hunter"
 	"github.com/brittonhayes/pillager/rules"
 	"github.com/spf13/afero"
@@ -42,10 +44,10 @@ pillager hunt ./example -r rules.toml -f custom --template "$(cat templates/simp
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
-	huntCmd.Flags().IntVarP(&workers, "workers", "w", 5, "number of concurrent workers to create")
+	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers to create")
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
-	huntCmd.Flags().StringVarP(&output, "format", "f", "yaml", "set output format (json, yaml, custom)")
+	huntCmd.Flags().StringVarP(&output, "format", "f", "json", "set output format (json, yaml, custom)")
 	huntCmd.Flags().StringVarP(
 		&templ,
 		"template",

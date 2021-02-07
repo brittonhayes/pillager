@@ -12,9 +12,9 @@ import (
 // has been found and outputs it for the user.
 func ExampleHound_Howl_json() {
 	h := NewHound(&Config{
-		System: afero.NewMemMapFs(),
-		Rules:  rules.Load(""),
-		Format: JSONFormat,
+		System:   afero.NewMemMapFs(),
+		Gitleaks: rules.Load(""),
+		Format:   JSONFormat,
 	})
 	findings := scan.Report{
 		Leaks: []scan.Leak{

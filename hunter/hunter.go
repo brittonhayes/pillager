@@ -46,8 +46,8 @@ func (h Hunter) Hunt() error {
 		return fmt.Errorf("config file does not exist")
 	}
 
-	opt := options.Options{Path: h.Config.BasePath, Verbose: h.Config.Verbose}
-	conf := config.Config{Rules: h.Config.Rules}
+	opt := options.Options{Path: h.Config.BasePath, Verbose: h.Config.Verbose, Threads: h.Config.Workers}
+	conf := config.Config{Allowlist: h.Config.Gitleaks.Allowlist, Rules: h.Config.Gitleaks.Rules}
 
 	scanner := scan.NewNoGitScanner(opt, conf)
 	report, err := scanner.Scan()
@@ -55,6 +55,9 @@ func (h Hunter) Hunt() error {
 		return err
 	}
 
-	h.Hound.Howl(report)
+	if !opt.Verbose {
+		h.Hound.Howl(report)
+	}
+
 	return nil
 }

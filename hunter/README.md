@@ -13,15 +13,7 @@ Package hunter contains the types\, methods\, and interfaces for the file huntin
 - [Constants](<#constants>)
 - [func RenderTemplate(w io.Writer, tpl string, f scan.Report)](<#func-rendertemplate>)
 - [type Config](<#type-config>)
-  - [func NewConfig(
-    fs afero.Fs,
-    path string,
-    verbose bool,
-    rules []gitleaks.Rule,
-    format Format,
-    template string,
-    workers int,
-) *Config](<#func-newconfig>)
+  - [func NewConfig(fs afero.Fs, path string, verbose bool, gitleaks gitleaks.Config, format Format, template string, workers int) *Config](<#func-newconfig>)
   - [func (c *Config) Default() *Config](<#func-config-default>)
   - [func (c *Config) Validate() (err error)](<#func-config-validate>)
 - [type Configer](<#type-configer>)
@@ -44,14 +36,15 @@ DefaultTemplate is the base template used to format a Finding into the custom ou
 
 ```go
 const DefaultTemplate = `{{ with . -}}
-{{ range .Leaks -}}Loot: {{.LineNumber}}
-{{ .File }}
+{{ range .Leaks -}}Line: {{.LineNumber}}
+File: {{ .File }}
+Offender: {{ .Offender }}
 
 {{end}}
 {{- end}}`
 ```
 
-## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/hunter/template.go#L22>)
+## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/hunter/template.go#L23>)
 
 ```go
 func RenderTemplate(w io.Writer, tpl string, f scan.Report)
@@ -69,29 +62,21 @@ type Config struct {
     BasePath string
     Verbose  bool
     Workers  int
-    Rules    []gitleaks.Rule
+    Gitleaks gitleaks.Config
     Format   Format
     Template string
 }
 ```
 
-### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L32-L40>)
+### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L32>)
 
 ```go
-func NewConfig(
-    fs afero.Fs,
-    path string,
-    verbose bool,
-    rules []gitleaks.Rule,
-    format Format,
-    template string,
-    workers int,
-) *Config
+func NewConfig(fs afero.Fs, path string, verbose bool, gitleaks gitleaks.Config, format Format, template string, workers int) *Config
 ```
 
 NewConfig generates a new config for the Hunter
 
-### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L55>)
+### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L47>)
 
 ```go
 func (c *Config) Default() *Config
@@ -99,7 +84,7 @@ func (c *Config) Default() *Config
 
 Default loads the default configuration for the Hunter
 
-### func \(\*Config\) [Validate](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L68>)
+### func \(\*Config\) [Validate](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L60>)
 
 ```go
 func (c *Config) Validate() (err error)
@@ -177,9 +162,9 @@ Here is an example of utilizing the Howl function on a slice of findings\. The H
 ```go
 {
 	h := NewHound(&Config{
-		System: afero.NewMemMapFs(),
-		Rules:  rules.Load(""),
-		Format: JSONFormat,
+		System:   afero.NewMemMapFs(),
+		Gitleaks: rules.Load(""),
+		Format:   JSONFormat,
 	})
 	findings := scan.Report{
 		Leaks: []scan.Leak{
