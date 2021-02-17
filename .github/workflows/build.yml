@@ -18,6 +18,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: build --rm-dist
+          args: build --rm-dist --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
