@@ -4,9 +4,7 @@ before:
     - go mod download
     - go vet
 builds:
-  - env:
-      - CGO_ENABLED=1
-    goos:
+  - goos:
       - linux
       - windows
       - darwin
@@ -54,8 +52,7 @@ scoop:
   license: MIT
 
 brews:
-  -
-    # Name template of the recipe
+  - # Name template of the recipe
     # Default to project name
     name: pillager
 
