@@ -1,18 +1,18 @@
 name: test
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+
+on: [ pull_request ]
+
 jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.16
+
       - name: test
         run: go test -v ./...

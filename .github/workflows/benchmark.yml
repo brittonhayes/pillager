@@ -1,9 +1,7 @@
 name: benchmark
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+
+on: [ pull_request ]
+
 jobs:
   benchmark:
     name: Run benchmarks
@@ -15,5 +13,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: go get ./...
+
       - name: Run benchmarks
         run: go test -bench . -benchmem ./...

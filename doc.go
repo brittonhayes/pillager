@@ -33,8 +33,4 @@ THE SOFTWARE.
 //		scoop bucket add pillager https://github.com/brittonhayes/pillager-scoop.git
 //		scoop install pillager
 //
-// Disclaimer
-//
-//
-// This goes without saying but I'm going to say it anyways: I am not responsible for any repercussions caused by your use of pillager. This tool is intended for defensive, Blue Team use.
 package main
