@@ -27,19 +27,22 @@ var huntCmd = &cobra.Command{
 	Long:  "Hunt inside the file system for valuable information",
 	Example: `
 # Run a basic hunt
-pillager hunt ./
+pillager hunt .
 
 # Print out results in JSON format
-pillager hunt ./example -r rules.toml -f json
+pillager hunt ./example -f json
+
+# Print out results in YAML format
+pillager hunt . -f yaml
 
 # Print out results with a custom inline template
-pillager hunt ./example -r rules.toml -f custom --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
 
 # Print out results with a custom template file
-pillager hunt ./example -r rules.toml -f custom --template "$(cat templates/simple.tmpl)"
+pillager hunt ./example --template "$(cat templates/simple.tmpl)"
 `,
-	Args: cobra.MinimumNArgs(1),
-	RunE: StartHunt(),
+	Args: cobra.ExactArgs(1),
+	RunE: startHunt(),
 }
 
 func init() {
@@ -47,17 +50,17 @@ func init() {
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers to create")
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
-	huntCmd.Flags().StringVarP(&output, "format", "f", "json", "set output format (json, yaml, custom)")
+	huntCmd.Flags().StringVarP(&output, "format", "f", "json", "set output format (json, yaml)")
 	huntCmd.Flags().StringVarP(
 		&templ,
 		"template",
 		"t",
-		hunter.DefaultTemplate,
+		"",
 		"set go text/template string for output format",
 	)
 }
 
-func StartHunt() func(cmd *cobra.Command, args []string) error {
+func startHunt() func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c := hunter.NewConfig(
 			afero.NewOsFs(),

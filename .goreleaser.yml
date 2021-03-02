@@ -8,6 +8,11 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -s -w -X github.com/brittonhayes/pillager/cmd.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
 archives:
   - replacements:
       darwin: Darwin

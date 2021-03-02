@@ -39,15 +39,18 @@ func NewHound(c *Config) *Hound {
 
 // Howl prints out the Findings from the Hound in the preferred output format
 func (h *Hound) Howl(findings scan.Report) {
+	if h.Config.Template != "" {
+		h.Config.Format = CustomFormat
+	}
 	switch h.Config.Format {
 	case JSONFormat:
-		b, err := json.Marshal(&findings)
+		b, err := json.Marshal(&findings.Leaks)
 		if err != nil {
 			log.Fatal("Failed to unmarshal findings")
 		}
 		fmt.Println(string(b))
 	case YAMLFormat:
-		b, err := yaml.Marshal(&findings)
+		b, err := yaml.Marshal(&findings.Leaks)
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 			return
@@ -55,5 +58,7 @@ func (h *Hound) Howl(findings scan.Report) {
 		fmt.Println(string(b))
 	case CustomFormat:
 		RenderTemplate(os.Stdout, h.Config.Template, findings)
+	default:
+		RenderTemplate(os.Stdout, DefaultTemplate, findings)
 	}
 }
