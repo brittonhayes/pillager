@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/brittonhayes/pillager/templates"
 	"github.com/ghodss/yaml"
 	"github.com/zricethezav/gitleaks/v7/scan"
 )
@@ -56,9 +57,17 @@ func (h *Hound) Howl(findings scan.Report) {
 			return
 		}
 		fmt.Println(string(b))
+	case HTMLFormat:
+		RenderTemplate(os.Stdout, templates.HTML, findings)
+	case HTMLTableFormat:
+		RenderTemplate(os.Stdout, templates.HTMLTable, findings)
+	case MarkdownFormat:
+		RenderTemplate(os.Stdout, templates.Markdown, findings)
+	case TableFormat:
+		RenderTemplate(os.Stdout, templates.Table, findings)
 	case CustomFormat:
 		RenderTemplate(os.Stdout, h.Config.Template, findings)
 	default:
-		RenderTemplate(os.Stdout, DefaultTemplate, findings)
+		RenderTemplate(os.Stdout, templates.Simple, findings)
 	}
 }

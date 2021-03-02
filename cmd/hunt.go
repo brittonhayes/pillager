@@ -26,20 +26,29 @@ var huntCmd = &cobra.Command{
 	Short: "Hunt for loot",
 	Long:  "Hunt inside the file system for valuable information",
 	Example: `
-# Run a basic hunt
-pillager hunt .
-
-# Print out results in JSON format
-pillager hunt ./example -f json
-
-# Print out results in YAML format
-pillager hunt . -f yaml
-
-# Print out results with a custom inline template
-pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
-
-# Print out results with a custom template file
-pillager hunt ./example --template "$(cat templates/simple.tmpl)"
+	Basic:
+		pillager hunt .
+	
+	JSON Format:
+		pillager hunt ./example -f json
+	
+	YAML Format:
+		pillager hunt . -f yaml
+	
+	HTML Format:
+		pillager hunt . -f html > results.html
+	
+	HTML Table Format:
+		pillager hunt . -f html-table > results.html
+	
+	Markdown Table Format:
+		pillager hunt . -f table > results.md
+	
+	Custom Go Template Format:
+		pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+	
+	Custom Go Template Format from Template File:
+		pillager hunt ./example --template "$(cat templates/simple.tmpl)"
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: startHunt(),
