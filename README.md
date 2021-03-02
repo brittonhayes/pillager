@@ -97,11 +97,11 @@ Pillager allows you to use powerful `go text/template` to customize the output f
 
 ```gotemplate
 {{/*basic.tmpl*/}}
-{{ range .Leaks}}
-Leak: {{.Line}}
-Line: {{.LineNumber}}
+{{ range .Leaks -}}
 File: {{ .File }}
-{{end}}
+Line: {{.LineNumber}}
+Offender: {{ .Offender }}
+{{ end -}}
 ```
 
 #### Markdown Styling
@@ -114,6 +114,8 @@ File: {{ .File }}
 - Location: {{.LineNumber}}
 {{end}}
 ```
+
+> More template examples can be found in the [templates](./templates) directory.
 
 ## Documentation
 

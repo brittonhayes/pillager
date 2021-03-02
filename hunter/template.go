@@ -11,12 +11,12 @@ import (
 // DefaultTemplate is the base template used to
 // format a Finding into the custom output format
 const DefaultTemplate = `{{ with . -}}
-{{ range .Leaks -}}Line: {{.LineNumber}}
+{{ range .Leaks -}}
+Line: {{.LineNumber}}
 File: {{ .File }}
 Offender: {{ .Offender }}
 
-{{end}}
-{{- end}}`
+{{ end -}}{{- end}}`
 
 // RenderTemplate renders a Hound finding in a
 // custom go template format to the provided writer

@@ -51,7 +51,6 @@ func (c *Config) Default() *Config {
 		System:   fs,
 		BasePath: v.Path(fs, "."),
 		Verbose:  false,
-		Template: DefaultTemplate,
 		Gitleaks: rules.Load(""),
 		Format:   JSONFormat,
 	}
