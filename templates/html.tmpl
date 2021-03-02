@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pillager - Scan Results</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bulmaswatch/superhero/bulmaswatch.min.css">
 </head>
 <body>
 <section class="section">
@@ -22,7 +22,9 @@
                         <p class="is-size-4">{{.File}}</p>
                         <p>
                             <span class="has-text-weight-bold">Tags:</span>
-                            <span class="tag">{{.Tags}}</span>
+                            <span class="tag">
+                                <code>{{.Tags}}</code>
+                            </span>
                         </p>
                         <p>
                             <span class="has-text-weight-bold">Leak:</span>
