@@ -89,6 +89,75 @@ regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9
 tags = ["email", "User Info"]
 ```
 
+### Built-in Output Formats
+
+Pillager has a series of built-in output formats available. Pick your flavor!
+
+#### Basic
+
+```shell
+pillager hunt .
+```
+
+#### JSON
+
+```shell
+pillager hunt ./example -f json | jq .
+```
+
+> *JSON output is designed to work seamlessly with*
+> *the amazing [jq](https://github.com/stedolan/jq)*
+> *utility for easy parsing.*
+
+<details>
+<summary>Click to view more output formats</summary>
+<br>
+
+#### YAML
+
+```shell
+pillager hunt . -f yaml
+```
+
+#### HTML
+
+```shell
+pillager hunt . -f html > results.html
+```
+
+#### HTML Table
+
+```shell
+pillager hunt . -f html-table > results.html
+```
+
+#### Markdown
+
+```shell
+pillager hunt . -f markdown > results.md
+```
+
+#### Markdown Table
+
+```shell
+pillager hunt . -f table > results.md
+```
+
+#### Custom Go Template
+
+```shell
+pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+```
+
+#### Custom Go Template from File
+
+```shell
+pillager hunt . -t "$(cat templates/simple.tmpl)"
+```
+
+</details>
+
+
 ### Custom Templates
 
 Pillager allows you to use powerful `go text/template` to customize the output format. Here are a few template examples.
