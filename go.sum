@@ -346,6 +346,8 @@ github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 h1:eY9dn8+vbi4tKz5
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/zricethezav/gitleaks/v7 v7.2.2 h1:s1d7U+mZxRoVmrlg3Q5lXUAz5VlyiKamqk3YY9em7tY=
 github.com/zricethezav/gitleaks/v7 v7.2.2/go.mod h1:AeD3Z1CzRxF5zhhbFR86hRSlygc7XxBOFr2kEzM3Law=
+github.com/zricethezav/gitleaks/v7 v7.3.0 h1:jwJR63N3NNDuXVxgCCfaJmfvK6DB0hIZLuhatjlWWSQ=
+github.com/zricethezav/gitleaks/v7 v7.3.0/go.mod h1:gQpiwVtl0SBJJzHMB/BXKRpt0ldSt0ZLauVcv8sofi8=
 go.etcd.io/bbolt v1.3.2 h1:Z/90sZLPOeCy2PwprqkFa25PdkusRzaj9P8zm/KNyvk=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
