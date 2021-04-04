@@ -49,6 +49,12 @@ brew tap brittonhayes/homebrew-pillager
 brew install pillager
 ```
 
+### Docker Image
+
+```
+docker run --rm -it bjhayes/pillager hunt . 
+```
+
 If you're looking for a binary, check the latest releases for the executable that matches your system
 
 ## Usage
