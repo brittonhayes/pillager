@@ -5,10 +5,7 @@ on: [ pull_request ]
 jobs:
   benchmark:
     name: Run benchmarks
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
