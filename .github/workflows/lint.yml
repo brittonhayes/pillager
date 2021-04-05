@@ -3,8 +3,7 @@ name: reviewdog
 on: [ pull_request ]
 
 jobs:
-  golangci-lint:
-    name: golangci-lint
+  reviewdog:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
@@ -12,13 +11,6 @@ jobs:
 
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v1
-
-  misspell:
-    name: misspell
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
 
       - name: misspell
         uses: reviewdog/action-golangci-lint@v1
