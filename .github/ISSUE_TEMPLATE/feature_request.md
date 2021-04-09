@@ -1,9 +1,9 @@
 ---
 name: Feature request
-about: Wish pillager did had a new feature? Let us know!
+about: Wish pillager had a new feature? Let us know!
 title: ''
-labels: enhancement
-assignees: brittonhayes
+labels: feature
+assignees: ''
 
 ---
 
