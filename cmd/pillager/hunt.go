@@ -6,8 +6,8 @@ package pillager
 import (
 	"runtime"
 
-	hunter2 "github.com/brittonhayes/pillager/pkg/hunter"
-	rules2 "github.com/brittonhayes/pillager/pkg/rules"
+	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -71,16 +71,16 @@ func init() {
 
 func startHunt() func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		c := hunter2.NewConfig(
+		c := hunter.NewConfig(
 			afero.NewOsFs(),
 			args[0],
 			verbose,
-			rules2.Load(rulesConfig),
-			hunter2.StringToFormat(output),
+			rules.Load(rulesConfig),
+			hunter.StringToFormat(output),
 			templ,
 			workers,
 		)
-		h := hunter2.NewHunter(c)
+		h := hunter.NewHunter(c)
 		return h.Hunt()
 	}
 }
