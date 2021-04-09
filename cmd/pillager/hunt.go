@@ -1,13 +1,13 @@
-// Package cmd contains the command line logic
+// Package pillager contains the command line logic
 //
-// The cmd package is the primary consumer of all packages in the /pkg directory
-package cmd
+// The pillager package is the primary consumer of all packages in the /pkg directory
+package pillager
 
 import (
 	"runtime"
 
-	"github.com/brittonhayes/pillager/hunter"
-	"github.com/brittonhayes/pillager/rules"
+	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )

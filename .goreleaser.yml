@@ -9,7 +9,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -s -w -X github.com/brittonhayes/pillager/cmd.version={{.Version}}
+      - -s -w -X github.com/brittonhayes/pillager/cmd/pillager.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser

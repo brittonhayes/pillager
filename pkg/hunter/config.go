@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/brittonhayes/pillager/internal/validate"
-	"github.com/brittonhayes/pillager/rules"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	gitleaks "github.com/zricethezav/gitleaks/v7/config"
 )

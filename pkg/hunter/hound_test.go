@@ -1,7 +1,7 @@
 package hunter
 
 import (
-	"github.com/brittonhayes/pillager/rules"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	"github.com/zricethezav/gitleaks/v7/scan"
 )
