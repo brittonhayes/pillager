@@ -8,9 +8,7 @@ app "cli" {
   }
 
   build {
-    use "docker" {
-      dockerfile = "build/Dockerfile"
-    }
+    use "docker" {}
 
     registry {
       use "docker" {
