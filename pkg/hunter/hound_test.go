@@ -1,7 +1,7 @@
 package hunter
 
 import (
-	rules2 "github.com/brittonhayes/pillager/pkg/rules"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	"github.com/zricethezav/gitleaks/v7/scan"
 )
@@ -13,7 +13,7 @@ import (
 func ExampleHound_Howl_json() {
 	h := NewHound(&Config{
 		System:   afero.NewMemMapFs(),
-		Gitleaks: rules2.Load(""),
+		Gitleaks: rules.Load(""),
 		Format:   JSONFormat,
 	})
 	findings := scan.Report{
