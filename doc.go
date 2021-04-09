@@ -33,4 +33,9 @@ THE SOFTWARE.
 //		scoop bucket add pillager https://github.com/brittonhayes/pillager-scoop.git
 //		scoop install pillager
 //
+// OSX/Linux
+//
+// 		brew tap brittonhayes/homebrew-pillager
+// 		brew install pillager
+//
 package main

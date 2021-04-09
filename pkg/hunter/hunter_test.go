@@ -1,7 +1,7 @@
 package hunter
 
 import (
-	"github.com/brittonhayes/pillager/rules"
+	rules2 "github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 )
 
@@ -21,7 +21,7 @@ func ExampleHunter_Hunt_email() {
 		panic(err)
 	}
 
-	config := NewConfig(fs, "./", true, rules.Load(""), StringToFormat("yaml"), DefaultTemplate, 5)
+	config := NewConfig(fs, "./", true, rules2.Load(""), StringToFormat("yaml"), DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -42,7 +42,7 @@ func ExampleHunter_Hunt_custom_output() {
 		panic(err)
 	}
 
-	config := NewConfig(fs, "./", true, rules.Load(""), CustomFormat, DefaultTemplate, 5)
+	config := NewConfig(fs, "./", true, rules2.Load(""), CustomFormat, DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -61,7 +61,7 @@ func ExampleHunter_Hunt_json() {
 		panic(err)
 	}
 
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
+	config := NewConfig(fs, ".", true, rules2.Load(""), JSONFormat, DefaultTemplate, 5)
 	h := NewHunter(config)
 	_ = h.Hunt()
 }
@@ -79,7 +79,7 @@ func ExampleHunter_Hunt_toml() {
 		panic(err)
 	}
 
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
+	config := NewConfig(fs, ".", true, rules2.Load(""), JSONFormat, DefaultTemplate, 5)
 
 	h := NewHunter(config)
 	_ = h.Hunt()

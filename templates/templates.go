@@ -1,6 +1,8 @@
 package templates
 
-import _ "embed"
+import (
+	_ "embed"
+)
 
 var (
 	//go:embed simple.tmpl

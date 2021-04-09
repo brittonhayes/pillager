@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/brittonhayes/pillager/internal/validate"
-	"github.com/brittonhayes/pillager/rules"
+	rules2 "github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	gitleaks "github.com/zricethezav/gitleaks/v7/config"
 )
@@ -51,7 +51,7 @@ func (c *Config) Default() *Config {
 		System:   fs,
 		BasePath: v.Path(fs, "."),
 		Verbose:  false,
-		Gitleaks: rules.Load(""),
+		Gitleaks: rules2.Load(""),
 		Format:   JSONFormat,
 	}
 }

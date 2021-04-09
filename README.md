@@ -194,7 +194,7 @@ Offender: {{ .Offender }}
 
 ## Documentation
 
-:books: [View the docs](hunter)
+:books: [View the docs](pkg/hunter)
 
 GoDoc documentation is available on [pkg.go.dev for pillager](https://pkg.go.dev/github.com/brittonhayes/pillager) but
 it is also available for all packages in the repository in markdown format. Just open the folder of any package, and

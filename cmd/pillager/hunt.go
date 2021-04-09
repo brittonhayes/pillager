@@ -1,13 +1,13 @@
-// Package cmd contains the command line logic
+// Package pillager contains the command line logic
 //
-// The cmd package is the primary consumer of all packages in the /pkg directory
-package cmd
+// The pillager package is the primary consumer of all packages in the /pkg directory
+package pillager
 
 import (
 	"runtime"
 
-	"github.com/brittonhayes/pillager/hunter"
-	"github.com/brittonhayes/pillager/rules"
+	hunter2 "github.com/brittonhayes/pillager/pkg/hunter"
+	rules2 "github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -71,16 +71,16 @@ func init() {
 
 func startHunt() func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		c := hunter.NewConfig(
+		c := hunter2.NewConfig(
 			afero.NewOsFs(),
 			args[0],
 			verbose,
-			rules.Load(rulesConfig),
-			hunter.StringToFormat(output),
+			rules2.Load(rulesConfig),
+			hunter2.StringToFormat(output),
 			templ,
 			workers,
 		)
-		h := hunter.NewHunter(c)
+		h := hunter2.NewHunter(c)
 		return h.Hunt()
 	}
 }
