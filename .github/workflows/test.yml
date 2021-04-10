@@ -14,5 +14,10 @@ jobs:
         with:
           go-version: 1.16
 
-      - name: test
-        run: go test -v ./...
+      - name: Test
+        run: |
+          go test -race ./... -coverprofile cover.out
+          bash <(curl -s https://codecov.io/bash)
+
+      - name: Coverage
+        run: go tool cover -func cover.out
