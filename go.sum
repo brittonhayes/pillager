@@ -240,8 +240,8 @@ github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0B
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 h1:QldyIu/L63oPpyvQmHgvgickp1Yw510KJOqX7H24mg8=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
-github.com/zricethezav/gitleaks/v7 v7.3.0 h1:jwJR63N3NNDuXVxgCCfaJmfvK6DB0hIZLuhatjlWWSQ=
-github.com/zricethezav/gitleaks/v7 v7.3.0/go.mod h1:gQpiwVtl0SBJJzHMB/BXKRpt0ldSt0ZLauVcv8sofi8=
+github.com/zricethezav/gitleaks/v7 v7.4.0 h1:dpH0lsB5tjXa7VaDo/l1UFgglmp1+lzdmZAE68gWh3g=
+github.com/zricethezav/gitleaks/v7 v7.4.0/go.mod h1:gQpiwVtl0SBJJzHMB/BXKRpt0ldSt0ZLauVcv8sofi8=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
