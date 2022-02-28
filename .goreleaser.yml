@@ -13,6 +13,8 @@ builds:
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser
+    main: "./cmd/pillager"
+
 archives:
   - replacements:
       darwin: Darwin
