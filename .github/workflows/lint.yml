@@ -1,6 +1,6 @@
 name: reviewdog
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   reviewdog:
@@ -10,11 +10,4 @@ jobs:
         uses: actions/checkout@v1
 
       - name: golangci-lint
-        uses: reviewdog/action-golangci-lint@v1
-
-      - name: misspell
-        uses: reviewdog/action-golangci-lint@v1
-        with:
-          golangci_lint_flags: "--disable-all -E misspell"
-          tool_name: misspell
-          level: info
+        uses: reviewdog/action-golangci-lint@v2
