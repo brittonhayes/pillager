@@ -10,7 +10,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/afero v1.6.0
 	github.com/spf13/cobra v1.3.0
-	github.com/spf13/viper v1.10.0
+	github.com/spf13/viper v1.10.1
 	github.com/zricethezav/gitleaks/v7 v7.6.1
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -43,7 +43,7 @@ require (
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
