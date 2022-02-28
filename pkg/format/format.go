@@ -19,7 +19,7 @@ func (s Style) String() string {
 }
 
 // StringToFormat takes in a string representation of the preferred
-// output format and returns to enum equivalent
+// output format and returns to enum equivalent.
 func StringToFormat(s string) Style {
 	switch strings.ToLower(s) {
 	case "yaml":

@@ -11,6 +11,7 @@ import "github.com/brittonhayes/pillager/pkg/format"
 - [Constants](<#constants>)
 - [func RenderTemplate(w io.Writer, tpl string, f scan.Report) error](<#func-rendertemplate>)
 - [type Style](<#type-style>)
+  - [func StringToFormat(s string) Style](<#func-stringtoformat>)
   - [func (s Style) String() string](<#func-style-string>)
 
 
@@ -36,7 +37,7 @@ func RenderTemplate(w io.Writer, tpl string, f scan.Report) error
 
 RenderTemplate renders a finding in a custom go template format to the provided writer\.
 
-## type [Style](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L13>)
+## type [Style](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L15>)
 
 ```go
 type Style int
@@ -44,7 +45,7 @@ type Style int
 
 ```go
 const (
-    StyleJSON Style = iota + 1
+    StyleJSON Style = iota
     StyleYAML
     StyleTable
     StyleHTML
@@ -54,7 +55,15 @@ const (
 )
 ```
 
-### func \(Style\) [String](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L15>)
+### func [StringToFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L23>)
+
+```go
+func StringToFormat(s string) Style
+```
+
+StringToFormat takes in a string representation of the preferred output format and returns to enum equivalent\.
+
+### func \(Style\) [String](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L17>)
 
 ```go
 func (s Style) String() string

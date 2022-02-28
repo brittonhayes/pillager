@@ -16,7 +16,7 @@ Package hunter contains the types\, methods\, and interfaces for the file huntin
   - [func (h *Hunter) Report(w io.Writer, results scan.Report) error](<#func-hunter-report>)
 
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L18-L20>)
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L19-L21>)
 
 Hunter is the secret scanner\.
 
@@ -26,7 +26,7 @@ type Hunter struct {
 }
 ```
 
-### func [New](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L23>)
+### func [New](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L24>)
 
 ```go
 func New(opts ...pillager.ConfigOption) (*Hunter, error)
@@ -34,7 +34,7 @@ func New(opts ...pillager.ConfigOption) (*Hunter, error)
 
 New creates an instance of the Hunter\.
 
-### func \(\*Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L30>)
+### func \(\*Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L31>)
 
 ```go
 func (h *Hunter) Hunt() (scan.Report, error)
@@ -42,7 +42,7 @@ func (h *Hunter) Hunt() (scan.Report, error)
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information\.
 
-### func \(\*Hunter\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L44>)
+### func \(\*Hunter\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L47>)
 
 ```go
 func (h *Hunter) Report(w io.Writer, results scan.Report) error
