@@ -82,9 +82,13 @@ func WithScanPath(path string) ConfigOption {
 	}
 }
 
-func WithLogLevel(level zerolog.Level) ConfigOption {
+func WithLogLevel(level string) ConfigOption {
 	return func(c *Config) {
-		zerolog.SetGlobalLevel(level)
+		lvl, err := zerolog.ParseLevel(level)
+		if err != nil {
+			log.Fatal().Err(err).Send()
+		}
+		zerolog.SetGlobalLevel(lvl)
 	}
 }
 

@@ -10,13 +10,12 @@ import (
 	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
-	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
 var (
 	verbose     bool
-	debug       bool
+	level       string
 	rulesConfig string
 	style       string
 	templ       string
@@ -61,7 +60,7 @@ var huntCmd = &cobra.Command{
 			pillager.WithVerbose(verbose),
 			pillager.WithTemplate(templ),
 			pillager.WithStyle(format.StringToFormat(style)),
-			pillager.WithLogLevel(zerolog.DebugLevel),
+			pillager.WithLogLevel(level),
 		)
 		if err != nil {
 			return err
@@ -83,9 +82,9 @@ var huntCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
-	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers to create")
-	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
-	huntCmd.Flags().BoolVarP(&debug, "debug", "d", false, "toggle debug mode")
+	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
+	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable scanner verbose output")
+	huntCmd.Flags().StringVarP(&level, "log-level", "l", "error", "set logging level")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
 	huntCmd.Flags().StringVarP(&style, "format", "f", "json", "set output format (json, yaml)")
 	huntCmd.Flags().StringVarP(
