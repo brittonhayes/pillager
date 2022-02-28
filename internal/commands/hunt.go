@@ -4,23 +4,26 @@
 package pillager
 
 import (
+	"os"
 	"runtime"
 
+	"github.com/brittonhayes/pillager"
+	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
-	"github.com/brittonhayes/pillager/pkg/rules"
-	"github.com/spf13/afero"
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
 var (
 	verbose     bool
+	debug       bool
 	rulesConfig string
-	output      string
+	style       string
 	templ       string
 	workers     int
 )
 
-// huntCmd represents the hunt command
+// huntCmd represents the hunt command.
 var huntCmd = &cobra.Command{
 	Use:   "hunt [directory]",
 	Short: "Hunt for loot",
@@ -51,15 +54,40 @@ var huntCmd = &cobra.Command{
 		pillager hunt ./example --template "$(cat templates/simple.tmpl)"
 `,
 	Args: cobra.ExactArgs(1),
-	RunE: startHunt(),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		h, err := hunter.New(
+			pillager.WithScanPath(args[0]),
+			pillager.WithWorkers(workers),
+			pillager.WithVerbose(verbose),
+			pillager.WithTemplate(templ),
+			pillager.WithStyle(format.StringToFormat(style)),
+			pillager.WithLogLevel(zerolog.DebugLevel),
+		)
+		if err != nil {
+			return err
+		}
+
+		results, err := h.Hunt()
+		if err != nil {
+			return err
+		}
+
+		err = h.Report(os.Stdout, results)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	},
 }
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers to create")
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "toggle verbose output")
+	huntCmd.Flags().BoolVarP(&debug, "debug", "d", false, "toggle debug mode")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
-	huntCmd.Flags().StringVarP(&output, "format", "f", "json", "set output format (json, yaml)")
+	huntCmd.Flags().StringVarP(&style, "format", "f", "json", "set output format (json, yaml)")
 	huntCmd.Flags().StringVarP(
 		&templ,
 		"template",
@@ -67,20 +95,4 @@ func init() {
 		"",
 		"set go text/template string for output format",
 	)
-}
-
-func startHunt() func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		c := hunter.NewConfig(
-			afero.NewOsFs(),
-			args[0],
-			verbose,
-			rules.Load(rulesConfig),
-			hunter.StringToFormat(output),
-			templ,
-			workers,
-		)
-		h := hunter.NewHunter(c)
-		return h.Hunt()
-	}
 }

@@ -1,32 +1,74 @@
 package rules
 
 import (
-	"log"
+	_ "embed"
 
 	"github.com/BurntSushi/toml"
+	"github.com/rs/zerolog/log"
 	gitleaks "github.com/zricethezav/gitleaks/v7/config"
 )
 
-// Load loads the config file into an array of gitleaks rules
-func Load(filepath string) gitleaks.Config {
-	var (
-		config gitleaks.TomlLoader
-		err    error
-	)
+const (
+	ErrReadConfig = "Failed to read config"
+)
 
-	if filepath != "" {
-		_, err = toml.DecodeFile(filepath, &config)
-	} else {
-		_, err = toml.Decode(DefaultConfig, &config)
-	}
+var (
+	//go:embed rules_simple.toml
+	RulesDefault string
+
+	//go:embed rules_strict.toml
+	RulesStrict string
+)
+
+type Loader struct {
+	loader gitleaks.TomlLoader
+}
+
+type LoaderOption func(*Loader)
+
+// NewLoader creates a configuration
+// loader.
+func NewLoader(opts ...LoaderOption) *Loader {
+	var loader Loader
+	_, err := toml.Decode(RulesDefault, &loader.loader)
 	if err != nil {
-		log.Fatal("Failed to read in config ", err.Error())
+		log.Fatal().Err(err).Msg(ErrReadConfig)
 	}
 
-	c, err := config.Parse()
+	for _, opt := range opts {
+		opt(&loader)
+	}
+
+	return &loader
+}
+
+// WithStrict enables more strict pillager scanning.
+func (l *Loader) WithStrict() LoaderOption {
+	return func(l *Loader) {
+		_, err := toml.Decode(RulesStrict, &l.loader)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ErrReadConfig)
+		}
+	}
+}
+
+// Load parses the gitleaks configuration.
+func (l *Loader) Load() gitleaks.Config {
+	config, err := l.loader.Parse()
 	if err != nil {
-		log.Fatal("Failed to parse in toml config")
+		log.Fatal().Err(err).Msg(ErrReadConfig)
 	}
 
-	return c
+	return config
+}
+
+// FromFile decodes the configuration
+// from a local file.
+func FromFile(file string) LoaderOption {
+	return func(l *Loader) {
+		_, err := toml.DecodeFile(file, &l.loader)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ErrReadConfig)
+		}
+	}
 }

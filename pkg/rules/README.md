@@ -3,56 +3,86 @@
 # rules
 
 ```go
-import "github.com/brittonhayes/pillager/rules"
+import "github.com/brittonhayes/pillager/pkg/rules"
 ```
 
 ## Index
 
 - [Constants](<#constants>)
-- [func Load(filepath string) gitleaks.Config](<#func-load>)
+- [Variables](<#variables>)
+- [type Loader](<#type-loader>)
+  - [func NewLoader(opts ...LoaderOption) *Loader](<#func-newloader>)
+  - [func (l *Loader) Load() gitleaks.Config](<#func-loader-load>)
+  - [func (l *Loader) WithStrict() LoaderOption](<#func-loader-withstrict>)
+- [type LoaderOption](<#type-loaderoption>)
+  - [func FromFile(file string) LoaderOption](<#func-fromfile>)
 
 
 ## Constants
 
-DefaultConfig is the default ruleset for pillager's hunting parameters\. This can be overridden by providing a rules\.toml file as an argument\.
-
 ```go
-const DefaultConfig = `
-title = "pillager config"
-[[rules]]
-	description = "AWS Access Key"
-	regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
-	tags = ["key", "AWS"]
-[[rules]]
-	description = "AWS Secret Key"
-	regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
-	tags = ["key", "AWS"]
-[[rules]]
-	description = "Github"
-	regex = '''(?i)github(.{0,20})?(?-i)[0-9a-zA-Z]{35,40}'''
-	tags = ["key", "Github"]
-[[rules]]
-	description = "Slack"
-	regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})?'''
-	tags = ["key", "Slack"]
-[[rules]]
-	description = "Asymmetric Private Key"
-	regex = '''-----BEGIN ((EC|PGP|DSA|RSA|OPENSSH) )?PRIVATE KEY( BLOCK)?-----'''
-	tags = ["key", "AsymmetricPrivateKey"]
-[[rules]]
-	description = "Slack Webhook"
-	regex = '''https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}'''
-	tags = ["key", "slack"]
-`
+const (
+    ErrReadConfig = "Failed to read config"
+)
 ```
 
-## func [Load](<https://github.com/brittonhayes/pillager/blob/main/rules/rules.go#L11>)
+## Variables
 
 ```go
-func Load(filepath string) gitleaks.Config
+var (
+    //go:embed rules_simple.toml
+    RulesDefault string
+
+    //go:embed rules_strict.toml
+    RulesStrict string
+)
 ```
 
-Load loads the config file into an array of gitleaks rules
+## type [Loader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L23-L25>)
+
+```go
+type Loader struct {
+    // contains filtered or unexported fields
+}
+```
+
+### func [NewLoader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L31>)
+
+```go
+func NewLoader(opts ...LoaderOption) *Loader
+```
+
+NewLoader creates a configuration loader\.
+
+### func \(\*Loader\) [Load](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L56>)
+
+```go
+func (l *Loader) Load() gitleaks.Config
+```
+
+Load parses the gitleaks configuration\.
+
+### func \(\*Loader\) [WithStrict](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L46>)
+
+```go
+func (l *Loader) WithStrict() LoaderOption
+```
+
+WithStrict enables more strict pillager scanning\.
+
+## type [LoaderOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L27>)
+
+```go
+type LoaderOption func(*Loader)
+```
+
+### func [FromFile](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L67>)
+
+```go
+func FromFile(file string) LoaderOption
+```
+
+FromFile decodes the configuration from a local file\.
 
 
 

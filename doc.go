@@ -38,4 +38,4 @@ THE SOFTWARE.
 // 		brew tap brittonhayes/homebrew-pillager
 // 		brew install pillager
 //
-package main
+package pillager
