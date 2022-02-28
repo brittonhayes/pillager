@@ -9,10 +9,12 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -s -w -X github.com/brittonhayes/pillager/cmd/pillager.version={{.Version}}
+      - -s -w -X github.com/brittonhayes/pillager/internal/commands/version.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser
+    main: "./cmd/pillager"
+
 archives:
   - replacements:
       darwin: Darwin
@@ -21,17 +23,17 @@ archives:
       386: i386
       amd64: x86_64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^images:'
-      - '^_examples:'
+      - "^docs:"
+      - "^test:"
+      - "^images:"
+      - "^_examples:"
 scoop:
   # Template for the url which is determined by the given Token (github or gitlab)
   url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
@@ -64,7 +66,7 @@ brews:
     # GOARM to specify which 32-bit arm version to use if there are multiple versions
     # from the build section. Brew formulas support atm only one 32-bit version.
     # Default is 6 for all artifacts or each id if there a multiple versions.
-    goarm: 6
+    goarm: "6"
 
     # GitHub/GitLab repository to push the formula to
     # Gitea is not supported yet, but the support coming

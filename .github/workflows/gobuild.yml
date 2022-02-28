@@ -1,6 +1,6 @@
 name: build
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   goreleaser:
@@ -16,9 +16,5 @@ jobs:
           go-version: 1.17
 
       - name: Build executables
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: build --rm-dist --skip-validate
-        env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
+        run: |
+          go build cmd/pillager/main.go

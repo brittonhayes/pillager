@@ -1,20 +1,42 @@
 package main
 
 import (
-	"runtime"
+	"os"
 
+	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/hunter"
-	"github.com/brittonhayes/pillager/pkg/rules"
-	"github.com/spf13/afero"
+	"github.com/rs/zerolog"
 )
 
 func main() {
-	// Create a new hunter config
-	c := hunter.NewConfig(afero.NewOsFs(), ".", true, rules.Load(""), hunter.StringToFormat("JSON"), "", runtime.NumCPU())
+	err := example()
+	if err != nil {
+		panic(err)
+	}
+}
 
-	// Create a new hunter from the config
-	h := hunter.NewHunter(c)
+func example() error {
+	opts := []pillager.ConfigOption{
+		pillager.WithLogLevel(zerolog.DebugLevel),
+	}
+
+	// Create a new hunter config
+	p, err := hunter.New(opts...)
+	if err != nil {
+		return err
+	}
 
 	// Start hunting
-	_ = h.Hunt()
+	results, err := p.Hunt()
+	if err != nil {
+		return err
+	}
+
+	// Report results
+	err = p.Report(os.Stdout, results)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

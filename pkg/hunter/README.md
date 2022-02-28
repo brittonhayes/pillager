@@ -3,339 +3,52 @@
 # hunter
 
 ```go
-import "github.com/brittonhayes/pillager/hunter"
+import "github.com/brittonhayes/pillager/pkg/hunter"
 ```
 
 Package hunter contains the types\, methods\, and interfaces for the file hunting portion of pillager
 
 ## Index
 
-- [Constants](<#constants>)
-- [func RenderTemplate(w io.Writer, tpl string, f scan.Report)](<#func-rendertemplate>)
-- [type Config](<#type-config>)
-  - [func NewConfig(fs afero.Fs, path string, verbose bool, gitleaks gitleaks.Config, format Format, template string, workers int) *Config](<#func-newconfig>)
-  - [func (c *Config) Default() *Config](<#func-config-default>)
-  - [func (c *Config) Validate() (err error)](<#func-config-validate>)
-- [type Configer](<#type-configer>)
-- [type Format](<#type-format>)
-  - [func StringToFormat(s string) Format](<#func-stringtoformat>)
-  - [func (f Format) String() string](<#func-format-string>)
-- [type Hound](<#type-hound>)
-  - [func NewHound(c *Config) *Hound](<#func-newhound>)
-  - [func (h *Hound) Howl(findings scan.Report)](<#func-hound-howl>)
-- [type Hounder](<#type-hounder>)
 - [type Hunter](<#type-hunter>)
-  - [func NewHunter(c *Config) *Hunter](<#func-newhunter>)
-  - [func (h Hunter) Hunt() error](<#func-hunter-hunt>)
-- [type Hunting](<#type-hunting>)
+  - [func New(opts ...pillager.ConfigOption) (*Hunter, error)](<#func-new>)
+  - [func (h *Hunter) Hunt() (scan.Report, error)](<#func-hunter-hunt>)
+  - [func (h *Hunter) Report(w io.Writer, results scan.Report) error](<#func-hunter-report>)
 
 
-## Constants
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L19-L21>)
 
-DefaultTemplate is the base template used to format a Finding into the custom output format
-
-```go
-const DefaultTemplate = `{{ with . -}}
-{{ range .Leaks -}}Line: {{.LineNumber}}
-File: {{ .File }}
-Offender: {{ .Offender }}
-
-{{end}}
-{{- end}}`
-```
-
-## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/hunter/template.go#L23>)
-
-```go
-func RenderTemplate(w io.Writer, tpl string, f scan.Report)
-```
-
-RenderTemplate renders a Hound finding in a custom go template format to the provided writer
-
-## type [Config](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L16-L24>)
-
-Config takes all of the configurable parameters for a Hunter
-
-```go
-type Config struct {
-    System   afero.Fs
-    BasePath string
-    Verbose  bool
-    Workers  int
-    Gitleaks gitleaks.Config
-    Format   Format
-    Template string
-}
-```
-
-### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L32>)
-
-```go
-func NewConfig(fs afero.Fs, path string, verbose bool, gitleaks gitleaks.Config, format Format, template string, workers int) *Config
-```
-
-NewConfig generates a new config for the Hunter
-
-### func \(\*Config\) [Default](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L47>)
-
-```go
-func (c *Config) Default() *Config
-```
-
-Default loads the default configuration for the Hunter
-
-### func \(\*Config\) [Validate](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L60>)
-
-```go
-func (c *Config) Validate() (err error)
-```
-
-## type [Configer](<https://github.com/brittonhayes/pillager/blob/main/hunter/config.go#L26-L29>)
-
-```go
-type Configer interface {
-    Default() *Config
-    Validate() (err error)
-}
-```
-
-## type [Format](<https://github.com/brittonhayes/pillager/blob/main/hunter/format.go#L11>)
-
-```go
-type Format int
-```
-
-```go
-const (
-    JSONFormat Format = iota + 1
-    YAMLFormat
-    CustomFormat
-)
-```
-
-### func [StringToFormat](<https://github.com/brittonhayes/pillager/blob/main/hunter/format.go#L19>)
-
-```go
-func StringToFormat(s string) Format
-```
-
-StringToFormat takes in a string representation of the preferred output format and returns to enum equivalent
-
-### func \(Format\) [String](<https://github.com/brittonhayes/pillager/blob/main/hunter/format.go#L13>)
-
-```go
-func (f Format) String() string
-```
-
-## type [Hound](<https://github.com/brittonhayes/pillager/blob/main/hunter/hound.go#L22-L25>)
-
-A Hound performs the file inspection and returns the results
-
-```go
-type Hound struct {
-    Config   *Config
-    Findings scan.Report `json:"findings"`
-}
-```
-
-### func [NewHound](<https://github.com/brittonhayes/pillager/blob/main/hunter/hound.go#L28>)
-
-```go
-func NewHound(c *Config) *Hound
-```
-
-NewHound creates an instance of the Hound type
-
-### func \(\*Hound\) [Howl](<https://github.com/brittonhayes/pillager/blob/main/hunter/hound.go#L41>)
-
-```go
-func (h *Hound) Howl(findings scan.Report)
-```
-
-Howl prints out the Findings from the Hound in the preferred output format
-
-<details><summary>Example</summary>
-<p>
-
-Here is an example of utilizing the Howl function on a slice of findings\. The Howl method is the final method in the hunting process\. It takes whatever has been found and outputs it for the user\.
-
-```go
-{
-	h := NewHound(&Config{
-		System:   afero.NewMemMapFs(),
-		Gitleaks: rules.Load(""),
-		Format:   JSONFormat,
-	})
-	findings := scan.Report{
-		Leaks: []scan.Leak{
-			{Line: "person@email.com", LineNumber: 16, Offender: "person@email.com", Rule: "Email Addresses"},
-		},
-	}
-
-	h.Howl(findings)
-}
-```
-
-</p>
-</details>
-
-## type [Hounder](<https://github.com/brittonhayes/pillager/blob/main/hunter/hound.go#L17-L19>)
-
-The Hounder interface defines the available methods for instances of the Hound type
-
-```go
-type Hounder interface {
-    Howl(findings scan.Report)
-}
-```
-
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/hunter/hunter.go#L14-L17>)
-
-Hunter holds the required fields to implement the Hunting interface and utilize the hunter package
+Hunter is the secret scanner\.
 
 ```go
 type Hunter struct {
-    Config *Config
-    Hound  *Hound
+    *pillager.Config
 }
 ```
 
-### func [NewHunter](<https://github.com/brittonhayes/pillager/blob/main/hunter/hunter.go#L27>)
+### func [New](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L24>)
 
 ```go
-func NewHunter(c *Config) *Hunter
+func New(opts ...pillager.ConfigOption) (*Hunter, error)
 ```
 
-NewHunter creates an instance of the Hunter type
+New creates an instance of the Hunter\.
 
-### func \(Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/hunter/hunter.go#L43>)
+### func \(\*Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L31>)
 
 ```go
-func (h Hunter) Hunt() error
+func (h *Hunter) Hunt() (scan.Report, error)
 ```
 
-Hunt walks over the filesystem at the configured path\, looking for sensitive information
+Hunt walks over the filesystem at the configured path\, looking for sensitive information\.
 
-<details><summary>Example</summary>
-<p>
-
-This method also accepts custom output formats using go template/html\. So if you don't like yaml or json\, you can format to your heart's content\.
+### func \(\*Hunter\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L47>)
 
 ```go
-{
-	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.yaml")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	_, err = f.Write([]byte(`https://github.com/brittonhayes/pillager`))
-	if err != nil {
-		panic(err)
-	}
-
-	config := NewConfig(fs, "./", true, rules.Load(""), CustomFormat, DefaultTemplate, 5)
-	h := NewHunter(config)
-	_ = h.Hunt()
-}
+func (h *Hunter) Report(w io.Writer, results scan.Report) error
 ```
 
-</p>
-</details>
-
-<details><summary>Example</summary>
-<p>
-
-This is an example of how to run a scan on a single file to look for email addresses\. We're using an in\-memory file system for simplicity\, but this supports using an actual file system as well\.
-
-```go
-{
-	fs := afero.NewMemMapFs()
-	f, err := fs.Create("example.toml")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	_, err = f.Write([]byte(`example@email.com`))
-	if err != nil {
-		panic(err)
-	}
-
-	config := NewConfig(fs, "./", true, rules.Load(""), StringToFormat("yaml"), DefaultTemplate, 5)
-	h := NewHunter(config)
-	_ = h.Hunt()
-}
-```
-
-</p>
-</details>
-
-<details><summary>Example</summary>
-<p>
-
-This method accepts json output format as well
-
-```go
-{
-	fs := afero.NewMemMapFs()
-	f, err := fs.Create("fake.json")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	_, err = f.Write([]byte(`git@github.com:brittonhayes/pillager.git`))
-	if err != nil {
-		panic(err)
-	}
-
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
-	h := NewHunter(config)
-	_ = h.Hunt()
-}
-```
-
-</p>
-</details>
-
-<details><summary>Example</summary>
-<p>
-
-Hunter will also look personally identifiable info in TOML
-
-```go
-{
-	fs := afero.NewMemMapFs()
-	f, err := fs.Create("fake.toml")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	_, err = f.Write([]byte(`fakeperson@example.com`))
-	if err != nil {
-		panic(err)
-	}
-
-	config := NewConfig(fs, ".", true, rules.Load(""), JSONFormat, DefaultTemplate, 5)
-
-	h := NewHunter(config)
-	_ = h.Hunt()
-}
-```
-
-</p>
-</details>
-
-## type [Hunting](<https://github.com/brittonhayes/pillager/blob/main/hunter/hunter.go#L22-L24>)
-
-Hunting is the primary API interface for the hunter package
-
-```go
-type Hunting interface {
-    Hunt() error
-}
-```
+Report prints out the Findings in the preferred output format\.
 
 
 

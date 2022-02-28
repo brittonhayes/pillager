@@ -1,8 +1,3 @@
-package rules
-
-// DefaultConfig is the default ruleset for pillager's hunting parameters.
-// This can be overridden by providing a rules.toml file as an argument.
-const DefaultConfig = `
 title = "pillager config"
 [[rules]]
 	description = "AWS Access Key"
@@ -31,7 +26,4 @@ title = "pillager config"
 
 [allowlist]
 	description = "Allowlisted files"
-	files = ['''^\.?gitleaks.toml$''',
-	'''(.*?)(png|jpg|gif|doc|docx|pdf|bin|xls|pyc|zip)$''',
-	'''(go.mod|go.sum)$''']
-`
+	files = ['''^\.?gitleaks.toml$''', '''(.*?)(png|jpg|gif|doc|docx|pdf|bin|xls|pyc|zip)$''', '''(go.mod|go.sum)$''']

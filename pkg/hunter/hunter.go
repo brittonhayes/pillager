@@ -1,62 +1,82 @@
 package hunter
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 
+	"github.com/brittonhayes/pillager"
+	"github.com/brittonhayes/pillager/pkg/format"
+	"github.com/brittonhayes/pillager/templates"
+	"github.com/rs/zerolog/log"
 	"github.com/zricethezav/gitleaks/v7/config"
 	"github.com/zricethezav/gitleaks/v7/options"
 	"github.com/zricethezav/gitleaks/v7/scan"
+	"gopkg.in/yaml.v2"
 )
 
-// Hunter holds the required fields to implement
-// the Hunting interface and utilize the hunter package
+// Hunter is the secret scanner.
 type Hunter struct {
-	Config *Config
-	Hound  *Hound
+	*pillager.Config
 }
 
-var _ Hunting = Hunter{}
-
-// Hunting is the primary API interface for the hunter package
-type Hunting interface {
-	Hunt() error
+// New creates an instance of the Hunter.
+func New(opts ...pillager.ConfigOption) (*Hunter, error) {
+	return &Hunter{
+		Config: pillager.NewConfig(opts...),
+	}, nil
 }
 
-// NewHunter creates an instance of the Hunter type
-func NewHunter(c *Config) *Hunter {
-	if c == nil {
-		var conf Config
-		return &Hunter{conf.Default(), NewHound(conf.Default())}
-	}
-
-	err := c.Validate()
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	return &Hunter{c, NewHound(c)}
-}
-
-// Hunt walks over the filesystem at the configured path, looking for sensitive information
-func (h Hunter) Hunt() error {
-	h.Hound = NewHound(h.Config)
-	if _, err := os.Stat(h.Config.BasePath); os.IsNotExist(err) {
-		return fmt.Errorf("config file does not exist")
-	}
-
-	opt := options.Options{Path: h.Config.BasePath, Verbose: h.Config.Verbose, Threads: h.Config.Workers}
-	conf := config.Config{Allowlist: h.Config.Gitleaks.Allowlist, Rules: h.Config.Gitleaks.Rules}
+// Hunt walks over the filesystem at the configured path, looking for sensitive information.
+func (h *Hunter) Hunt() (scan.Report, error) {
+	opt := options.Options{Path: h.ScanPath, Verbose: h.Verbose, Threads: h.Workers}
+	conf := config.Config{Allowlist: h.Gitleaks.Allowlist, Rules: h.Gitleaks.Rules}
 
 	scanner := scan.NewNoGitScanner(opt, conf)
+	log.Debug().Str("style", h.Style.String()).Bool("verbose", h.Verbose).Msg("scanner created")
+
 	report, err := scanner.Scan()
 	if err != nil {
-		return err
+		return scan.Report{}, err
 	}
 
-	if !opt.Verbose {
-		h.Hound.Howl(report)
+	return report, nil
+}
+
+// Report prints out the Findings in the preferred output format.
+func (h *Hunter) Report(w io.Writer, results scan.Report) error {
+	switch h.Style {
+	case format.StyleJSON:
+		encoder := json.NewEncoder(w)
+		err := encoder.Encode(&results.Leaks)
+		if err != nil {
+			return err
+		}
+
+	case format.StyleYAML:
+		b, err := yaml.Marshal(&results.Leaks)
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(w, "%s\n", string(b))
+
+	case format.StyleHTML:
+		return format.RenderTemplate(w, templates.HTML, results)
+
+	case format.StyleHTMLTable:
+		return format.RenderTemplate(w, templates.HTMLTable, results)
+
+	case format.StyleMarkdown:
+		return format.RenderTemplate(w, templates.Markdown, results)
+
+	case format.StyleTable:
+		return format.RenderTemplate(w, templates.Table, results)
+
+	case format.StyleCustom:
+		return format.RenderTemplate(w, h.Template, results)
+
+	default:
+		return format.RenderTemplate(w, templates.Simple, results)
 	}
 
 	return nil

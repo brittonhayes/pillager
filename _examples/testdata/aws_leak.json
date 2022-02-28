@@ -1,9 +1,0 @@
-[
-  {
-    "lineNumber": 5,
-    "offender": "AKIAIO5FODNN7EXAMPLE",
-    "rule": "AWS Access Key",
-    "file": "../test_data/test_repos/test_dir_1/server.test.py",
-    "tags": "key, AWS"
-  }
-]

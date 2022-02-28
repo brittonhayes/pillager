@@ -1,6 +1,6 @@
 # Pillager
 
-![Image](./images/brand_image_ice.png)
+![Image](./logo.png)
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
 
@@ -52,7 +52,7 @@ brew install pillager
 ### Docker Image
 
 ```
-docker run --rm -it bjhayes/pillager hunt . 
+docker run --rm -it bjhayes/pillager hunt .
 ```
 
 If you're looking for a binary, check the latest releases for the executable that matches your system
@@ -111,9 +111,7 @@ pillager hunt .
 pillager hunt ./example -f json | jq .
 ```
 
-> *JSON output is designed to work seamlessly with*
-> *the amazing [jq](https://github.com/stedolan/jq)*
-> *utility for easy parsing.*
+> _JSON output is designed to work seamlessly with_ > _the amazing [jq](https://github.com/stedolan/jq)_ > _utility for easy parsing._
 
 <details>
 <summary>Click to view more output formats</summary>
@@ -163,7 +161,6 @@ pillager hunt . -t "$(cat templates/simple.tmpl)"
 
 </details>
 
-
 ### Custom Templates
 
 Pillager allows you to use powerful `go text/template` to customize the output format. Here are a few template examples.
@@ -209,7 +206,7 @@ awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
 
 **What is Cobra?**
 
-> Cobra is a library providing a simple interface to create powerful modern CLI interfaces similar to git & go tools. 
+> Cobra is a library providing a simple interface to create powerful modern CLI interfaces similar to git & go tools.
 > Cobra is also an application that will generate your application scaffolding to rapidly develop a Cobra-based application.
 
 If you've seen a CLI written in Go before, there's a pretty high chance it was built with Cobra. I can't recommend this
@@ -245,5 +242,5 @@ Check out the included [rules.toml](./rules.toml) for a baseline ruleset.
 > by the MITRE ATT&CK framework.
 >
 > [MITRE ATT&CK Technique - T1552,003 - Unsecured Credentials: Bash History ](https://attack.mitre.org/techniques/T1552/003/)
-> 
+>
 > [MITRE ATT&CK Technique - T1552,001 - Unsecured Credentials: Credentials In Files](https://attack.mitre.org/techniques/T1552/001/)
