@@ -6,13 +6,15 @@ import (
 )
 
 // StringToReporter takes in a string representation of the preferred
-// reporter
+// reporter.
 func StringToReporter(s string) Reporter {
 	switch strings.ToLower(s) {
 	case "json":
 		return JSON{}
 	case "yaml":
 		return YAML{}
+	case "toml":
+		return TOML{}
 	case "table":
 		return Table{}
 	case "html":

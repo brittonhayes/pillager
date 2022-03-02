@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/BurntSushi/toml"
 	"github.com/brittonhayes/pillager/pkg/templates"
 	"github.com/zricethezav/gitleaks/v8/report"
 	"gopkg.in/yaml.v2"
@@ -36,6 +37,13 @@ func (y YAML) Report(w io.Writer, findings []report.Finding) error {
 	fmt.Fprintf(w, "%s\n", string(b))
 
 	return nil
+}
+
+type TOML struct{}
+
+func (t TOML) Report(w io.Writer, findings []report.Finding) error {
+	enc := toml.NewEncoder(w)
+	return enc.Encode(&findings)
 }
 
 type HTML struct{}

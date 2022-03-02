@@ -6,13 +6,15 @@
 import "github.com/brittonhayes/pillager/pkg/rules"
 ```
 
+Package rules enables the parsing of Gitleaks rulesets
+
 ## Index
 
 - [Constants](<#constants>)
 - [Variables](<#variables>)
 - [type Loader](<#type-loader>)
   - [func NewLoader(opts ...LoaderOption) *Loader](<#func-newloader>)
-  - [func (l *Loader) Load() gitleaks.Config](<#func-loader-load>)
+  - [func (l *Loader) Load() config.Config](<#func-loader-load>)
   - [func (l *Loader) WithStrict() LoaderOption](<#func-loader-withstrict>)
 - [type LoaderOption](<#type-loaderoption>)
   - [func FromFile(file string) LoaderOption](<#func-fromfile>)
@@ -38,7 +40,7 @@ var (
 )
 ```
 
-## type [Loader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L23-L25>)
+## type [Loader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L25-L27>)
 
 ```go
 type Loader struct {
@@ -46,7 +48,7 @@ type Loader struct {
 }
 ```
 
-### func [NewLoader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L31>)
+### func [NewLoader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L33>)
 
 ```go
 func NewLoader(opts ...LoaderOption) *Loader
@@ -54,15 +56,15 @@ func NewLoader(opts ...LoaderOption) *Loader
 
 NewLoader creates a configuration loader\.
 
-### func \(\*Loader\) [Load](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L56>)
+### func \(\*Loader\) [Load](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L58>)
 
 ```go
-func (l *Loader) Load() gitleaks.Config
+func (l *Loader) Load() config.Config
 ```
 
 Load parses the gitleaks configuration\.
 
-### func \(\*Loader\) [WithStrict](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L46>)
+### func \(\*Loader\) [WithStrict](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L48>)
 
 ```go
 func (l *Loader) WithStrict() LoaderOption
@@ -70,13 +72,13 @@ func (l *Loader) WithStrict() LoaderOption
 
 WithStrict enables more strict pillager scanning\.
 
-## type [LoaderOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L27>)
+## type [LoaderOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L29>)
 
 ```go
 type LoaderOption func(*Loader)
 ```
 
-### func [FromFile](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L67>)
+### func [FromFile](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L69>)
 
 ```go
 func FromFile(file string) LoaderOption
