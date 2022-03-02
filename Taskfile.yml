@@ -48,7 +48,7 @@ tasks:
   build:
     desc: run go build
     cmds:
-      - go build -v -o bin/pillager .
+      - go build -v -o bin/pillager cmd/pillager/main.go
     sources:
       - ./**/*.go
     generates:

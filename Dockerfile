@@ -2,7 +2,7 @@ FROM golang:1.17-alpine AS build
 
 WORKDIR /src/
 COPY . /src/
-RUN CGO_ENABLED=0 go build cmd/pillager/main.go -o /bin/pillager
+RUN CGO_ENABLED=0 go build -v -o /bin/pillager cmd/pillager/main.go
 
 FROM scratch as prod
 
