@@ -156,7 +156,7 @@ pillager hunt . -f table > results.md
 #### Custom Go Template
 
 ```shell
-pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
 ```
 
 #### Custom Go Template from File
@@ -176,7 +176,7 @@ Pillager allows you to use powerful `go text/template` to customize the output f
 ```gotemplate
 {{ range . -}}
     File: {{ .File }}
-    Secret: {{.Secret}}
+    Secret: {{ .Secret}}
     Description: {{ quote .Description }}
 {{ end -}}
 
