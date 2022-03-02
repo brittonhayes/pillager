@@ -52,7 +52,7 @@ brew install pillager
 ### Docker Image
 
 ```
-docker run --rm -it bjhayes/pillager hunt .
+docker run --rm -it ghcr.io/brittonhayes/pillager:latest hunt .
 ```
 
 If you're looking for a binary, check the latest releases for the executable that matches your system
