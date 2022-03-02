@@ -1,3 +1,4 @@
+// Package rules enables the parsing of Gitleaks rulesets
 package rules
 
 import (
@@ -5,7 +6,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/rs/zerolog/log"
-	gitleaks "github.com/zricethezav/gitleaks/v7/config"
+
+	"github.com/zricethezav/gitleaks/v8/config"
 )
 
 const (
@@ -21,7 +23,7 @@ var (
 )
 
 type Loader struct {
-	loader gitleaks.TomlLoader
+	loader config.ViperConfig
 }
 
 type LoaderOption func(*Loader)
@@ -53,8 +55,8 @@ func (l *Loader) WithStrict() LoaderOption {
 }
 
 // Load parses the gitleaks configuration.
-func (l *Loader) Load() gitleaks.Config {
-	config, err := l.loader.Parse()
+func (l *Loader) Load() config.Config {
+	config, err := l.loader.Translate()
 	if err != nil {
 		log.Fatal().Err(err).Msg(ErrReadConfig)
 	}

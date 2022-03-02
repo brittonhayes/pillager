@@ -1,4 +1,4 @@
-package pillager
+package commands
 
 import (
 	"fmt"

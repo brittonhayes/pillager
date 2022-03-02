@@ -1,40 +1,31 @@
+// Package format contains the renderer and available output formats
 package format
 
-import "strings"
-
-const (
-	StyleJSON Style = iota
-	StyleYAML
-	StyleTable
-	StyleHTML
-	StyleHTMLTable
-	StyleMarkdown
-	StyleCustom
+import (
+	"strings"
 )
 
-type Style int
-
-func (s Style) String() string {
-	return [...]string{"json", "yaml", "table", "html", "html-table", "markdown", "custom"}[s]
-}
-
-// StringToFormat takes in a string representation of the preferred
-// output format and returns to enum equivalent.
-func StringToFormat(s string) Style {
+// StringToReporter takes in a string representation of the preferred
+// reporter
+func StringToReporter(s string) Reporter {
 	switch strings.ToLower(s) {
+	case "json":
+		return JSON{}
 	case "yaml":
-		return StyleYAML
+		return YAML{}
 	case "table":
-		return StyleTable
+		return Table{}
 	case "html":
-		return StyleHTML
+		return HTML{}
 	case "html-table":
-		return StyleHTMLTable
+		return HTMLTable{}
 	case "markdown":
-		return StyleMarkdown
+		return Markdown{}
 	case "custom":
-		return StyleCustom
+		return Custom{}
+	case "simple":
+		return Simple{}
 	default:
-		return StyleJSON
+		return JSON{}
 	}
 }

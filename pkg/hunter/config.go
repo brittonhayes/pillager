@@ -1,8 +1,4 @@
-//go:generate golangci-lint run ./...
-//go:generate gomarkdoc ./pkg/hunter/...
-//go:generate gomarkdoc ./pkg/rules/...
-//go:generate gomarkdoc ./pkg/format/...
-package pillager
+package hunter
 
 import (
 	"errors"
@@ -13,21 +9,24 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/brittonhayes/pillager/internal/validate"
+
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/afero"
-	gitleaks "github.com/zricethezav/gitleaks/v7/config"
+
+	"github.com/zricethezav/gitleaks/v8/config"
 )
 
 // Config takes all of the configurable
 // parameters for a Hunter.
 type Config struct {
 	Filesystem afero.Fs
-	Style      format.Style
-	Gitleaks   gitleaks.Config
+	Reporter   format.Reporter
+	Gitleaks   config.Config
 
 	ScanPath string
 	Verbose  bool
+	Redact   bool
 	Debug    bool
 	Workers  int
 	Template string
@@ -40,7 +39,7 @@ func NewConfig(opts ...ConfigOption) *Config {
 		defaultFS       = afero.NewOsFs()
 		defaultVerbose  = false
 		defaultScanPath = "."
-		defaultStyle    = format.StyleJSON
+		defaultReporter = format.JSON{}
 		defaultWorkers  = runtime.NumCPU()
 		defaultGitleaks = rules.NewLoader().Load()
 		defaultTemplate = ""
@@ -52,7 +51,7 @@ func NewConfig(opts ...ConfigOption) *Config {
 	config := &Config{
 		ScanPath:   defaultScanPath,
 		Filesystem: defaultFS,
-		Style:      defaultStyle,
+		Reporter:   defaultReporter,
 		Workers:    defaultWorkers,
 		Gitleaks:   defaultGitleaks,
 		Verbose:    defaultVerbose,
@@ -104,25 +103,33 @@ func WithWorkers(count int) ConfigOption {
 	}
 }
 
-func WithStyle(style format.Style) ConfigOption {
+func WithRedact(redact bool) ConfigOption {
+	return func(c *Config) {
+		c.Redact = redact
+	}
+}
+
+func WithFormat(reporter format.Reporter) ConfigOption {
 	return func(c *Config) {
 		if c.Template != "" {
-			c.Style = format.StyleCustom
+			custom := &format.Custom{}
+			custom.WithTemplate(c.Template)
+			c.Reporter = custom
 			return
 		}
 
-		c.Style = style
+		c.Reporter = reporter
 	}
 }
 
 func WithTemplate(template string) ConfigOption {
 	return func(c *Config) {
-		c.Style = format.StyleCustom
+		c.Reporter = format.Custom{}
 		c.Template = template
 	}
 }
 
-func WithGitleaksConfig(g gitleaks.Config) ConfigOption {
+func WithGitleaksConfig(g config.Config) ConfigOption {
 	return func(c *Config) {
 		c.Gitleaks = g
 	}

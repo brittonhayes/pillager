@@ -1,2 +1,2 @@
-// Package hunter contains the types, methods, and interfaces for the file hunting portion of pillager
+// Package hunter contains secret hunting and file scanning tools
 package hunter

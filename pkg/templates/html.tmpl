@@ -16,7 +16,7 @@
             Results of your latest hunt
         </p>
         <div class="columns is-multiline">
-            {{ range .Leaks }}
+            {{ range . }}
                 <div class="column">
                     <div class="box shadow-md">
                         <p class="is-size-4">{{.File}}</p>
@@ -28,11 +28,11 @@
                         </p>
                         <p>
                             <span class="has-text-weight-bold">Leak:</span>
-                            <span class="is-family-code has-text-danger">{{.Offender}}</span>
+                            <span class="is-family-code has-text-danger">{{.Secret}}</span>
                         </p>
                         <p>
                             <span class="has-text-weight-bold">Line:</span>
-                            {{.LineNumber}}
+                            {{.StartLine}}
                         </p>
                     </div>
                 </div>
