@@ -198,6 +198,14 @@ it is also available for all packages in the repository in markdown format. Just
 you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the
 awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
 
+## Development
+
+To get involved developing features and fixes for Pillager, get started with the following:
+
+- [Install Go](https://go.dev/doc/install)
+- Install [Taskfile.dev](https://taskfile.dev/#/installation)
+- Read the [CONTRIBUTING.MD](./CONTRIBUTING.md)
+
 ---
 
 ### Shoulders of Giants :star:

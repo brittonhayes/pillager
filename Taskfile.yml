@@ -1,0 +1,85 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task -l
+
+  mod:
+    desc: download and tidy go modules
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  clean:
+    desc: remove executables, temporary, and cached files
+    ignore_error: true
+    cmds:
+      - rm bin/pillager
+      - go clean -cache
+      - rm -rf pkg/hunter/testdata
+      - mkdir pkg/hunter/testdata
+
+  lint:
+    desc: runs golint
+    cmds:
+      - golangci-lint run ./...
+
+  test:
+    desc: run all tests
+    cmds:
+      - go test ./...
+
+  test:v:
+    desc: run all tests verbose
+    cmds:
+      - go test -v ./...
+
+  test:cov:
+    desc: run all tests and generate coverage
+    cmds:
+      - go test -covermode=set -coverprofile=coverage.out ./...
+    sources:
+      - ./**/*.go
+    generates:
+      - coverage.out
+    method: checksum
+
+  build:
+    desc: run go build
+    cmds:
+      - go build -v -o bin/pillager .
+    sources:
+      - ./**/*.go
+    generates:
+      - bin/pillager
+    method: checksum
+
+  install:
+    desc: install executable
+    cmds:
+      - go install github.com/brittonhayes/pillager@latest
+
+  run:
+    desc: run the executable
+    cmds:
+      - task: build
+      - bin/pillager
+
+  docs:gen:
+    desc: generate documentation via gomarkdocwn
+    cmds:
+      - go generate ./...
+
+  docs:serve:
+    desc: serve godoc server locally
+    silent: true
+    cmds:
+      - echo "Documentation is available at http://localhost:6060/pkg/github.com/brittonhayes/pillager/"
+      - godoc -http=:6060
+
+  dev-setup:
+    desc: set things up for local development
+    cmds:
+      - task: mod
+      - task: build
