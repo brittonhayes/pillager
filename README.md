@@ -108,10 +108,10 @@ pillager hunt .
 #### JSON
 
 ```shell
-pillager hunt ./example -f json | jq .
+pillager hunt ./example -f json | jq
 ```
 
-> _JSON output is designed to work seamlessly with_ > _the amazing [jq](https://github.com/stedolan/jq)_ > _utility for easy parsing._
+> _JSON output is designed to work seamlessly with the amazing [jq](https://github.com/stedolan/jq) utility for easy parsing._
 
 <details>
 <summary>Click to view more output formats</summary>
@@ -121,6 +121,12 @@ pillager hunt ./example -f json | jq .
 
 ```shell
 pillager hunt . -f yaml
+```
+
+#### TOML
+
+```shell
+pillager hunt . -f toml
 ```
 
 #### HTML
@@ -156,7 +162,7 @@ pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
 #### Custom Go Template from File
 
 ```shell
-pillager hunt . -t "$(cat templates/simple.tmpl)"
+pillager hunt . -t "$(cat pkg/templates/simple.tmpl)"
 ```
 
 </details>
@@ -168,26 +174,27 @@ Pillager allows you to use powerful `go text/template` to customize the output f
 #### Basic
 
 ```gotemplate
-{{/*basic.tmpl*/}}
-{{ range .Leaks -}}
-File: {{ .File }}
-Line: {{.LineNumber}}
-Offender: {{ .Offender }}
+{{ range . -}}
+    File: {{ .File }}
+    Secret: {{.Secret}}
+    Description: {{ quote .Description }}
 {{ end -}}
+
 ```
 
 #### Markdown Styling
 
 ```gotemplate
-{{/*markdown.tmpl*/}}
 # Results
-{{ range .Leaks}}
-## {{ .File }}
-- Location: {{.LineNumber}}
+
+{{ range . -}}
+    ## {{ .File }}
+    - Location: {{.StartLine}}
 {{end}}
+
 ```
 
-> More template examples can be found in the [templates](./templates) directory.
+> More template examples can be found in the [templates](./pkg/templates) directory.
 
 ## Documentation
 

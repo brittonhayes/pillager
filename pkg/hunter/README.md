@@ -6,46 +6,143 @@
 import "github.com/brittonhayes/pillager/pkg/hunter"
 ```
 
-Package hunter contains the types\, methods\, and interfaces for the file hunting portion of pillager
+Package hunter contains secret hunting and file scanning tools
 
 ## Index
 
+- [type Config](<#type-config>)
+  - [func NewConfig(opts ...ConfigOption) *Config](<#func-newconfig>)
+- [type ConfigOption](<#type-configoption>)
+  - [func WithFS(fs afero.Fs) ConfigOption](<#func-withfs>)
+  - [func WithFormat(reporter format.Reporter) ConfigOption](<#func-withformat>)
+  - [func WithGitleaksConfig(g config.Config) ConfigOption](<#func-withgitleaksconfig>)
+  - [func WithLogLevel(level string) ConfigOption](<#func-withloglevel>)
+  - [func WithRedact(redact bool) ConfigOption](<#func-withredact>)
+  - [func WithScanPath(path string) ConfigOption](<#func-withscanpath>)
+  - [func WithTemplate(template string) ConfigOption](<#func-withtemplate>)
+  - [func WithVerbose(verbose bool) ConfigOption](<#func-withverbose>)
+  - [func WithWorkers(count int) ConfigOption](<#func-withworkers>)
 - [type Hunter](<#type-hunter>)
-  - [func New(opts ...pillager.ConfigOption) (*Hunter, error)](<#func-new>)
-  - [func (h *Hunter) Hunt() (scan.Report, error)](<#func-hunter-hunt>)
-  - [func (h *Hunter) Report(w io.Writer, results scan.Report) error](<#func-hunter-report>)
+  - [func New(opts ...ConfigOption) (*Hunter, error)](<#func-new>)
+  - [func (h *Hunter) Hunt() ([]report.Finding, error)](<#func-hunter-hunt>)
+  - [func (h *Hunter) Report(w io.Writer, findings []report.Finding) error](<#func-hunter-report>)
 
 
-## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L19-L21>)
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L22-L33>)
+
+Config takes all of the configurable parameters for a Hunter\.
+
+```go
+type Config struct {
+    Filesystem afero.Fs
+    Reporter   format.Reporter
+    Gitleaks   config.Config
+
+    ScanPath string
+    Verbose  bool
+    Redact   bool
+    Debug    bool
+    Workers  int
+    Template string
+}
+```
+
+### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L37>)
+
+```go
+func NewConfig(opts ...ConfigOption) *Config
+```
+
+## type [ConfigOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L35>)
+
+```go
+type ConfigOption func(*Config)
+```
+
+### func [WithFS](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L72>)
+
+```go
+func WithFS(fs afero.Fs) ConfigOption
+```
+
+### func [WithFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L112>)
+
+```go
+func WithFormat(reporter format.Reporter) ConfigOption
+```
+
+### func [WithGitleaksConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L132>)
+
+```go
+func WithGitleaksConfig(g config.Config) ConfigOption
+```
+
+### func [WithLogLevel](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L84>)
+
+```go
+func WithLogLevel(level string) ConfigOption
+```
+
+### func [WithRedact](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L106>)
+
+```go
+func WithRedact(redact bool) ConfigOption
+```
+
+### func [WithScanPath](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L78>)
+
+```go
+func WithScanPath(path string) ConfigOption
+```
+
+### func [WithTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L125>)
+
+```go
+func WithTemplate(template string) ConfigOption
+```
+
+### func [WithVerbose](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L94>)
+
+```go
+func WithVerbose(verbose bool) ConfigOption
+```
+
+### func [WithWorkers](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L100>)
+
+```go
+func WithWorkers(count int) ConfigOption
+```
+
+## type [Hunter](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L14-L16>)
 
 Hunter is the secret scanner\.
 
 ```go
 type Hunter struct {
-    *pillager.Config
+    *Config
 }
 ```
 
-### func [New](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L24>)
+### func [New](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L19>)
 
 ```go
-func New(opts ...pillager.ConfigOption) (*Hunter, error)
+func New(opts ...ConfigOption) (*Hunter, error)
 ```
 
 New creates an instance of the Hunter\.
 
-### func \(\*Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L31>)
+### func \(\*Hunter\) [Hunt](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L26>)
 
 ```go
-func (h *Hunter) Hunt() (scan.Report, error)
+func (h *Hunter) Hunt() ([]report.Finding, error)
 ```
 
 Hunt walks over the filesystem at the configured path\, looking for sensitive information\.
 
-### func \(\*Hunter\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L47>)
+### func \(\*Hunter\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/hunter.go#L41>)
 
 ```go
-func (h *Hunter) Report(w io.Writer, results scan.Report) error
+func (h *Hunter) Report(w io.Writer, findings []report.Finding) error
 ```
 
 Report prints out the Findings in the preferred output format\.

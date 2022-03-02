@@ -1,3 +1,4 @@
+// Package pillager is the entrypoint to the Pillager CLI
 package main
 
 import (

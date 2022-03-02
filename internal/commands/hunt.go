@@ -1,13 +1,12 @@
-// Package pillager contains the command line logic
+// Package commands contains the command line logic
 //
-// The pillager package is the primary consumer of all packages in the /pkg directory
-package pillager
+// The commands package is the primary consumer of all packages in the /pkg directory
+package commands
 
 import (
 	"os"
 	"runtime"
 
-	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
 	"github.com/spf13/cobra"
@@ -15,9 +14,10 @@ import (
 
 var (
 	verbose     bool
+	redact      bool
 	level       string
 	rulesConfig string
-	style       string
+	reporter    string
 	templ       string
 	workers     int
 )
@@ -47,20 +47,21 @@ var huntCmd = &cobra.Command{
 		pillager hunt . -f table > results.md
 	
 	Custom Go Template Format:
-		pillager hunt . --template "{{ range .Leaks}}Leak: {{.Line}}{{end}}"
+		pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
 	
 	Custom Go Template Format from Template File:
-		pillager hunt ./example --template "$(cat templates/simple.tmpl)"
+		pillager hunt ./example --template "$(cat pkg/templates/simple.tmpl)"
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		h, err := hunter.New(
-			pillager.WithScanPath(args[0]),
-			pillager.WithWorkers(workers),
-			pillager.WithVerbose(verbose),
-			pillager.WithTemplate(templ),
-			pillager.WithStyle(format.StringToFormat(style)),
-			pillager.WithLogLevel(level),
+			hunter.WithScanPath(args[0]),
+			hunter.WithWorkers(workers),
+			hunter.WithVerbose(verbose),
+			hunter.WithTemplate(templ),
+			hunter.WithRedact(redact),
+			hunter.WithFormat(format.StringToReporter(reporter)),
+			hunter.WithLogLevel(level),
 		)
 		if err != nil {
 			return err
@@ -86,12 +87,7 @@ func init() {
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable scanner verbose output")
 	huntCmd.Flags().StringVarP(&level, "log-level", "l", "error", "set logging level")
 	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
-	huntCmd.Flags().StringVarP(&style, "format", "f", "json", "set output format (json, yaml)")
-	huntCmd.Flags().StringVarP(
-		&templ,
-		"template",
-		"t",
-		"",
-		"set go text/template string for output format",
-	)
+	huntCmd.Flags().StringVarP(&reporter, "format", "f", "json", "set secret reporter (json, yaml)")
+	huntCmd.Flags().BoolVar(&redact, "redact", false, "redact secret from results")
+	huntCmd.Flags().StringVarP(&templ, "template", "t", "", "set go text/template string for output format")
 }

@@ -6,67 +6,163 @@
 import "github.com/brittonhayes/pillager/pkg/format"
 ```
 
+Package format contains the renderer and available output formats
+
 ## Index
 
-- [Constants](<#constants>)
-- [func RenderTemplate(w io.Writer, tpl string, f scan.Report) error](<#func-rendertemplate>)
-- [type Style](<#type-style>)
-  - [func StringToFormat(s string) Style](<#func-stringtoformat>)
-  - [func (s Style) String() string](<#func-style-string>)
+- [type Custom](<#type-custom>)
+  - [func (c Custom) Report(w io.Writer, findings []report.Finding) error](<#func-custom-report>)
+  - [func (c *Custom) WithTemplate(t string)](<#func-custom-withtemplate>)
+- [type HTML](<#type-html>)
+  - [func (h HTML) Report(w io.Writer, findings []report.Finding) error](<#func-html-report>)
+- [type HTMLTable](<#type-htmltable>)
+  - [func (h HTMLTable) Report(w io.Writer, findings []report.Finding) error](<#func-htmltable-report>)
+- [type JSON](<#type-json>)
+  - [func (j JSON) Report(w io.Writer, findings []report.Finding) error](<#func-json-report>)
+- [type Markdown](<#type-markdown>)
+  - [func (m Markdown) Report(w io.Writer, findings []report.Finding) error](<#func-markdown-report>)
+- [type Reporter](<#type-reporter>)
+  - [func StringToReporter(s string) Reporter](<#func-stringtoreporter>)
+- [type Simple](<#type-simple>)
+  - [func (s Simple) Report(w io.Writer, findings []report.Finding) error](<#func-simple-report>)
+- [type TOML](<#type-toml>)
+  - [func (t TOML) Report(w io.Writer, findings []report.Finding) error](<#func-toml-report>)
+- [type Table](<#type-table>)
+  - [func (t Table) Report(w io.Writer, findings []report.Finding) error](<#func-table-report>)
+- [type YAML](<#type-yaml>)
+  - [func (y YAML) Report(w io.Writer, findings []report.Finding) error](<#func-yaml-report>)
 
 
-## Constants
-
-DefaultTemplate is the base template used to format a Finding into the custom output format\.
+## type [Custom](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L73-L75>)
 
 ```go
-const DefaultTemplate = `{{ with . -}}
-{{ range .Leaks -}}
-Line: {{.LineNumber}}
-File: {{ .File }}
-Offender: {{ .Offender }}
-
-{{ end -}}{{- end}}`
+type Custom struct {
+    // contains filtered or unexported fields
+}
 ```
 
-## func [RenderTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/template.go#L23>)
+### func \(Custom\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L81>)
 
 ```go
-func RenderTemplate(w io.Writer, tpl string, f scan.Report) error
+func (c Custom) Report(w io.Writer, findings []report.Finding) error
 ```
 
-RenderTemplate renders a finding in a custom go template format to the provided writer\.
-
-## type [Style](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L15>)
+### func \(\*Custom\) [WithTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L77>)
 
 ```go
-type Style int
+func (c *Custom) WithTemplate(t string)
 ```
 
+## type [HTML](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L49>)
+
 ```go
-const (
-    StyleJSON Style = iota
-    StyleYAML
-    StyleTable
-    StyleHTML
-    StyleHTMLTable
-    StyleMarkdown
-    StyleCustom
-)
+type HTML struct{}
 ```
 
-### func [StringToFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L23>)
+### func \(HTML\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L51>)
 
 ```go
-func StringToFormat(s string) Style
+func (h HTML) Report(w io.Writer, findings []report.Finding) error
 ```
 
-StringToFormat takes in a string representation of the preferred output format and returns to enum equivalent\.
-
-### func \(Style\) [String](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L17>)
+## type [HTMLTable](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L55>)
 
 ```go
-func (s Style) String() string
+type HTMLTable struct{}
+```
+
+### func \(HTMLTable\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L57>)
+
+```go
+func (h HTMLTable) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [JSON](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L18>)
+
+```go
+type JSON struct{}
+```
+
+### func \(JSON\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L20>)
+
+```go
+func (j JSON) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [Markdown](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L61>)
+
+```go
+type Markdown struct{}
+```
+
+### func \(Markdown\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L63>)
+
+```go
+func (m Markdown) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [Reporter](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L14-L16>)
+
+```go
+type Reporter interface {
+    Report(io.Writer, []report.Finding) error
+}
+```
+
+### func [StringToReporter](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/format.go#L10>)
+
+```go
+func StringToReporter(s string) Reporter
+```
+
+StringToReporter takes in a string representation of the preferred reporter\.
+
+## type [Simple](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L85>)
+
+```go
+type Simple struct{}
+```
+
+### func \(Simple\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L87>)
+
+```go
+func (s Simple) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [TOML](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L42>)
+
+```go
+type TOML struct{}
+```
+
+### func \(TOML\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L44>)
+
+```go
+func (t TOML) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [Table](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L67>)
+
+```go
+type Table struct{}
+```
+
+### func \(Table\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L69>)
+
+```go
+func (t Table) Report(w io.Writer, findings []report.Finding) error
+```
+
+## type [YAML](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L30>)
+
+```go
+type YAML struct{}
+```
+
+### func \(YAML\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L32>)
+
+```go
+func (y YAML) Report(w io.Writer, findings []report.Finding) error
 ```
 
 
