@@ -78,7 +78,18 @@ func WithFS(fs afero.Fs) ConfigOption {
 
 func WithScanPath(path string) ConfigOption {
 	return func(c *Config) {
-		c.ScanPath = validate.Path(c.Filesystem, c.ScanPath)
+		if validate.PathExists(path) {
+			c.ScanPath = path
+			return
+		}
+
+		currentDir, err := os.Getwd()
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to get current dir")
+		}
+
+		log.Error().Msgf("scan path %q not found, defaulting to %q", path, currentDir)
+		c.ScanPath = currentDir
 	}
 }
 
