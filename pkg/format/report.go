@@ -19,8 +19,7 @@ type JSON struct{}
 
 func (j JSON) Report(w io.Writer, findings []report.Finding) error {
 	encoder := json.NewEncoder(w)
-	err := encoder.Encode(&findings)
-	if err != nil {
+	if err := encoder.Encode(&findings); err != nil {
 		return err
 	}
 

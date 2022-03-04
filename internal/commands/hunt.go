@@ -72,8 +72,7 @@ var huntCmd = &cobra.Command{
 			return err
 		}
 
-		err = h.Report(os.Stdout, results)
-		if err != nil {
+		if err = h.Report(os.Stdout, results); err != nil {
 			return err
 		}
 

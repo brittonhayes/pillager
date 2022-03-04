@@ -32,8 +32,7 @@ type LoaderOption func(*Loader)
 // loader.
 func NewLoader(opts ...LoaderOption) *Loader {
 	var loader Loader
-	_, err := toml.Decode(RulesDefault, &loader.loader)
-	if err != nil {
+	if _, err := toml.Decode(RulesDefault, &loader.loader); err != nil {
 		log.Fatal().Err(err).Msg(ErrReadConfig)
 	}
 
@@ -47,8 +46,7 @@ func NewLoader(opts ...LoaderOption) *Loader {
 // WithStrict enables more strict pillager scanning.
 func (l *Loader) WithStrict() LoaderOption {
 	return func(l *Loader) {
-		_, err := toml.Decode(RulesStrict, &l.loader)
-		if err != nil {
+		if _, err := toml.Decode(RulesStrict, &l.loader); err != nil {
 			log.Fatal().Err(err).Msg(ErrReadConfig)
 		}
 	}
@@ -68,8 +66,7 @@ func (l *Loader) Load() config.Config {
 // from a local file.
 func FromFile(file string) LoaderOption {
 	return func(l *Loader) {
-		_, err := toml.DecodeFile(file, &l.loader)
-		if err != nil {
+		if _, err := toml.DecodeFile(file, &l.loader); err != nil {
 			log.Fatal().Err(err).Msg(ErrReadConfig)
 		}
 	}
