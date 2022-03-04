@@ -6,7 +6,7 @@
 import "github.com/brittonhayes/pillager/pkg/rules"
 ```
 
-Package rules enables the parsing of Gitleaks rulesets
+Package rules enables the parsing of Gitleaks rulesets\.
 
 ## Index
 
@@ -22,13 +22,15 @@ Package rules enables the parsing of Gitleaks rulesets
 
 ## Constants
 
+ErrReadConfig is the custom error message used if an error is encountered reading the gitleaks config\.
+
 ```go
-const (
-    ErrReadConfig = "Failed to read config"
-)
+const ErrReadConfig = "Failed to read gitleaks config"
 ```
 
 ## Variables
+
+These strings contain default configs\. They are initialized at compile time via go:embed\.
 
 ```go
 var (
@@ -40,7 +42,9 @@ var (
 )
 ```
 
-## type [Loader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L25-L27>)
+## type [Loader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L27-L29>)
+
+Loader represents a gitleaks config loader\.
 
 ```go
 type Loader struct {
@@ -48,13 +52,13 @@ type Loader struct {
 }
 ```
 
-### func [NewLoader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L33>)
+### func [NewLoader](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L35>)
 
 ```go
 func NewLoader(opts ...LoaderOption) *Loader
 ```
 
-NewLoader creates a configuration loader\.
+NewLoader creates a Loader instance\.
 
 ### func \(\*Loader\) [Load](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L58>)
 
@@ -64,7 +68,7 @@ func (l *Loader) Load() config.Config
 
 Load parses the gitleaks configuration\.
 
-### func \(\*Loader\) [WithStrict](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L48>)
+### func \(\*Loader\) [WithStrict](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L49>)
 
 ```go
 func (l *Loader) WithStrict() LoaderOption
@@ -72,19 +76,21 @@ func (l *Loader) WithStrict() LoaderOption
 
 WithStrict enables more strict pillager scanning\.
 
-## type [LoaderOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L29>)
+## type [LoaderOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L32>)
+
+LoaderOption sets a parameter for the gitleaks config loader\.
 
 ```go
 type LoaderOption func(*Loader)
 ```
 
-### func [FromFile](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L69>)
+### func [FromFile](<https://github.com/brittonhayes/pillager/blob/main/pkg/rules/rules.go#L68>)
 
 ```go
 func FromFile(file string) LoaderOption
 ```
 
-FromFile decodes the configuration from a local file\.
+FromFile decodes a gitleaks config from a local file\.
 
 
 

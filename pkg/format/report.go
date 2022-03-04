@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Reporter is the interface that each of the canonical output formats implement.
 type Reporter interface {
 	Report(io.Writer, []report.Finding) error
 }
@@ -19,8 +20,7 @@ type JSON struct{}
 
 func (j JSON) Report(w io.Writer, findings []report.Finding) error {
 	encoder := json.NewEncoder(w)
-	err := encoder.Encode(&findings)
-	if err != nil {
+	if err := encoder.Encode(&findings); err != nil {
 		return err
 	}
 

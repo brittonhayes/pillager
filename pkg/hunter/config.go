@@ -17,8 +17,7 @@ import (
 	"github.com/zricethezav/gitleaks/v8/config"
 )
 
-// Config takes all of the configurable
-// parameters for a Hunter.
+// Config takes all of the configurable parameters for a Hunter.
 type Config struct {
 	Filesystem afero.Fs
 	Reporter   format.Reporter
@@ -32,8 +31,10 @@ type Config struct {
 	Template string
 }
 
+// ConfigOption is a convenient type alias for func(*Config).
 type ConfigOption func(*Config)
 
+// NewConfig creates a Config instance.
 func NewConfig(opts ...ConfigOption) *Config {
 	var (
 		defaultFS       = afero.NewOsFs()

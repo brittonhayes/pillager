@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// pillager is a tool for hunting through filesystems for sensitive information.
+// Package pillager is a tool for hunting through filesystems for sensitive information.
 //
 // Installation
 //

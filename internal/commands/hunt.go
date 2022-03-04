@@ -1,6 +1,6 @@
-// Package commands contains the command line logic
+// Package commands contains the command line logic.
 //
-// The commands package is the primary consumer of all packages in the /pkg directory
+// The commands package is the primary consumer of all packages in the /pkg directory.
 package commands
 
 import (
@@ -72,8 +72,7 @@ var huntCmd = &cobra.Command{
 			return err
 		}
 
-		err = h.Report(os.Stdout, results)
-		if err != nil {
+		if err = h.Report(os.Stdout, results); err != nil {
 			return err
 		}
 
