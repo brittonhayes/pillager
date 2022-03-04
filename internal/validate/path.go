@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/afero"
 )
 
-// Path checks if a filepath exists and
-// returns it if so, otherwise returns a default path.
+// Path checks if a file at the given path exists and returns it if so,
+// otherwise returns a default path.
 func Path(fs afero.Fs, path string) string {
 	ok, err := afero.Exists(fs, path)
 	if err != nil {

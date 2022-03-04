@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Reporter is the interface that each of the canonical output formats implement.
 type Reporter interface {
 	Report(io.Writer, []report.Finding) error
 }
