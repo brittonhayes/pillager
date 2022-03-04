@@ -9,7 +9,6 @@ import (
 
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -68,7 +67,6 @@ var huntCmd = &cobra.Command{
 			return err
 		}
 
-		log.Debug().Msg(h.ScanPath)
 		results, err := h.Hunt()
 		if err != nil {
 			return err
