@@ -9,6 +9,7 @@ import (
 
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +55,15 @@ var huntCmd = &cobra.Command{
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		// Read gitleaks config from file
+		// or fallback to default
+		gitleaksConfig := rules.NewLoader(
+			rules.WithFile(rulesConfig),
+		).Load()
+
 		h, err := hunter.New(
+			hunter.WithGitleaksConfig(gitleaksConfig),
 			hunter.WithScanPath(args[0]),
 			hunter.WithWorkers(workers),
 			hunter.WithVerbose(verbose),

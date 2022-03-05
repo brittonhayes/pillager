@@ -5,6 +5,7 @@ import (
 	_ "embed"
 
 	"github.com/BurntSushi/toml"
+	"github.com/brittonhayes/pillager/internal/validate"
 	"github.com/rs/zerolog/log"
 
 	"github.com/zricethezav/gitleaks/v8/config"
@@ -64,11 +65,23 @@ func (l *Loader) Load() config.Config {
 	return config
 }
 
-// FromFile decodes a gitleaks config from a local file.
-func FromFile(file string) LoaderOption {
+// WithFile decodes a gitleaks config from a local file.
+func WithFile(file string) LoaderOption {
 	return func(l *Loader) {
-		if _, err := toml.DecodeFile(file, &l.loader); err != nil {
-			log.Fatal().Err(err).Msg(ErrReadConfig)
+		if file == "" {
+			if _, err := toml.Decode(RulesDefault, &l.loader); err != nil {
+				log.Fatal().Err(err).Msg(ErrReadConfig)
+			}
+			return
 		}
+
+		if validate.PathExists(file) {
+			if _, err := toml.DecodeFile(file, &l.loader); err != nil {
+				log.Fatal().Err(err).Msg(ErrReadConfig)
+			}
+			return
+		}
+
+		log.Fatal().Msgf("invalid - rules file '%s' does not exist", file)
 	}
 }

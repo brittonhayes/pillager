@@ -47,7 +47,6 @@ func NewConfig(opts ...ConfigOption) *Config {
 		defaultLogLevel = zerolog.ErrorLevel
 	)
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(defaultLogLevel)
 	config := &Config{
 		ScanPath:   defaultScanPath,
