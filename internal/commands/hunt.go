@@ -55,7 +55,6 @@ var huntCmd = &cobra.Command{
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		// Read gitleaks config from file
 		// or fallback to default
 		gitleaksConfig := rules.NewLoader(
