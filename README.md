@@ -217,7 +217,7 @@ To get involved developing features and fixes for Pillager, get started with the
 
 ### Shoulders of Giants :star:
 
-#### [afero's Cobra](https://github.com/spf13/cobra)
+#### [spf13's Cobra](https://github.com/spf13/cobra)
 
 **What is Cobra?**
 
