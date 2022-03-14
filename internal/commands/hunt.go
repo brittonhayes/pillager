@@ -9,6 +9,7 @@ import (
 
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/pkg/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ var (
 	reporter    string
 	templ       string
 	workers     int
+	interactive bool
 )
 
 // huntCmd represents the hunt command.
@@ -67,6 +69,10 @@ var huntCmd = &cobra.Command{
 			return err
 		}
 
+		if interactive {
+			return runInteractive(h)
+		}
+
 		results, err := h.Hunt()
 		if err != nil {
 			return err
@@ -81,8 +87,13 @@ var huntCmd = &cobra.Command{
 	},
 }
 
+func runInteractive(h *hunter.Hunter) error {
+	return tui.Run(h)
+}
+
 func init() {
 	rootCmd.AddCommand(huntCmd)
+	huntCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "run in interactive mode")
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable scanner verbose output")
 	huntCmd.Flags().StringVarP(&level, "log-level", "l", "error", "set logging level")
