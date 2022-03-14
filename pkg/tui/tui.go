@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"os"
 
@@ -30,48 +32,43 @@ func Run(h *hunter.Hunter) error {
 	tview.Styles = theme
 
 	configView := component.NewConfig(h).View()
-	outputView := component.NewOutput().View()
+	outputView := component.NewOutput("press enter to search").View()
 
-	content := tview.NewFlex().
-		AddItem(configView, 0, 1, true).
-		AddItem(outputView, 0, 2, false)
-
-	content.SetBorder(true).
-		SetTitle(" pillager ").
+	container := tview.NewFlex()
+	container.SetBorder(true).
+		SetTitle(fmt.Sprintf(" %s ", "pillager")).
 		SetBorderPadding(1, 1, 1, 1)
 
-	label := "Enter Scan Path: "
-	input := component.NewInput(label, func(key tcell.Key) {
-		if key != tcell.KeyEnter {
-			return
-		}
+	container.AddItem(configView, 0, 1, false).AddItem(outputView, 0, 2, false)
 
-		findings, err := h.Hunt()
-		if err != nil {
-			log.Printf("\n\n%v", err)
-		}
-
-		table := component.NewTable(findings).View()
-		outputView.Clear().AddItem(table, 0, 1, false)
-	}).View()
-
-	flex := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(content, 0, 3, false).
-		AddItem(input, 0, 1, false)
+	flex := tview.NewFlex().SetDirection(tview.FlexRow).AddItem(container, 0, 3, true)
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Rune() {
-		case 'i':
-			app.SetFocus(input)
-		case 'c':
-			app.SetFocus(content)
-		case 'q':
+		switch event.Key() {
+		case tcell.KeyEnter:
+
+			findings, err := h.Hunt()
+			if err != nil {
+				log.Printf("\n\n%v", err)
+			}
+
+			buf := bytes.NewBuffer(nil)
+			if err := h.Report(buf, findings); err != nil {
+				log.Printf("\n\n%v", err)
+			}
+
+			outputView.Clear().AddItem(component.NewOutput(buf.String()).View(), 0, 2, false)
+
+		case tcell.KeyClear:
 			app.Stop()
 			os.Exit(0)
+
+		default:
+			return event
 		}
 
 		return event
 	})
 
-	return app.SetRoot(flex, true).SetFocus(input).EnableMouse(true).Run()
+	return app.SetRoot(flex, true).EnableMouse(true).Run()
 }

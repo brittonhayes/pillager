@@ -20,6 +20,18 @@ type JSON struct{}
 
 func (j JSON) Report(w io.Writer, findings []report.Finding) error {
 	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "\t")
+	if err := encoder.Encode(&findings); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type Raw struct{}
+
+func (r Raw) Report(w io.Writer, findings []report.Finding) error {
+	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(&findings); err != nil {
 		return err
 	}

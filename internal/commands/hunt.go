@@ -95,6 +95,8 @@ var huntCmd = &cobra.Command{
 }
 
 func runInteractive(h *hunter.Hunter) error {
+	h.Verbose = false
+	h.Debug = false
 	return tui.Run(h)
 }
 

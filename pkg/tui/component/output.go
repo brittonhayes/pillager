@@ -7,10 +7,14 @@ import (
 	"github.com/rivo/tview"
 )
 
-type Output struct{}
+type Output struct {
+	text string
+}
 
-func NewOutput() *Output {
-	return &Output{}
+func NewOutput(text string) *Output {
+	return &Output{
+		text: text,
+	}
 }
 
 func (o *Output) View() *tview.Flex {
@@ -18,9 +22,12 @@ func (o *Output) View() *tview.Flex {
 		log.Fatal(err)
 	}
 
+	body := tview.NewTextView().SetScrollable(true).SetTextAlign(tview.AlignLeft).SetText(o.text)
+	body.SetBorder(true).SetBorderPadding(0, 1, 1, 1)
+
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(tview.NewTextView().SetTextAlign(tview.AlignCenter), 0, 1, false)
+		AddItem(body, 0, 1, false)
 
 	return flex
 }

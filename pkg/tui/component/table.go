@@ -18,7 +18,9 @@ func NewTable(rows []report.Finding) *Table {
 
 func (t *Table) View() tview.Primitive {
 	if len(t.findings) == 0 {
-		return tview.NewTextView().SetText("No results")
+		fallback := tview.NewTextView().SetText("No results").SetTextColor(tcell.ColorOrange)
+		fallback.SetBorder(true).SetBorderPadding(0, 1, 1, 1)
+		return fallback
 	}
 
 	table := tview.NewTable().

@@ -67,10 +67,10 @@ func (c *Config) currentConfigView() *tview.Flex {
 	return flex
 }
 
-func (c *Config) newItem(title, text string) *tview.Form {
-	t := tview.NewForm()
+func (c *Config) newItem(title, text string) *tview.TextView {
+	t := tview.NewTextView()
 
-	t.AddInputField("", text, 0, nil, nil)
+	t.SetText(text)
 
 	t.SetBorder(true).
 		SetBorderPadding(0, 0, 1, 1).
