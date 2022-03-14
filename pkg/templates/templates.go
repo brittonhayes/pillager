@@ -1,4 +1,4 @@
-// Package templates contains a compilation of go templates for rendering secret findings
+// Package templates contains a compilation of go templates for rendering secret findings.
 package templates
 
 import (
@@ -29,8 +29,8 @@ var (
 	HTMLTable string
 )
 
-// DefaultTemplate is the base template used to
-// format a Finding into the custom output format.
+// DefaultTemplate is the base template used to format a Finding into the
+// custom output format.
 const DefaultTemplate = `{{ with . -}}
 {{ range . -}}
 Line: 	{{ quote .StartLine}}
@@ -39,8 +39,7 @@ Secret: {{ quote .Secret }}
 ---
 {{ end -}}{{- end}}`
 
-// Render renders a finding in a
-// custom go template format to the provided writer.
+// Render renders a finding in a custom go template format to the provided writer.
 func Render(w io.Writer, tpl string, findings []report.Finding) error {
 	t := template.New("custom")
 	if tpl == "" {

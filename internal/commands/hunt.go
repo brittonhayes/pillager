@@ -1,6 +1,6 @@
-// Package commands contains the command line logic
+// Package commands contains the command line logic.
 //
-// The commands package is the primary consumer of all packages in the /pkg directory
+// The commands package is the primary consumer of all packages in the /pkg directory.
 package commands
 
 import (
@@ -9,6 +9,7 @@ import (
 
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager/pkg/rules"
 	"github.com/brittonhayes/pillager/pkg/tui"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +57,14 @@ var huntCmd = &cobra.Command{
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Read gitleaks config from file
+		// or fallback to default
+		gitleaksConfig := rules.NewLoader(
+			rules.WithFile(rulesConfig),
+		).Load()
+
 		h, err := hunter.New(
+			hunter.WithGitleaksConfig(gitleaksConfig),
 			hunter.WithScanPath(args[0]),
 			hunter.WithWorkers(workers),
 			hunter.WithVerbose(verbose),
@@ -78,8 +86,7 @@ var huntCmd = &cobra.Command{
 			return err
 		}
 
-		err = h.Report(os.Stdout, results)
-		if err != nil {
+		if err = h.Report(os.Stdout, results); err != nil {
 			return err
 		}
 

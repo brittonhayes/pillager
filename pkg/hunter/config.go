@@ -17,8 +17,7 @@ import (
 	"github.com/zricethezav/gitleaks/v8/config"
 )
 
-// Config takes all of the configurable
-// parameters for a Hunter.
+// Config takes all of the configurable parameters for a Hunter.
 type Config struct {
 	Filesystem afero.Fs
 	Reporter   format.Reporter
@@ -32,8 +31,10 @@ type Config struct {
 	Template string
 }
 
+// ConfigOption is a convenient type alias for func(*Config).
 type ConfigOption func(*Config)
 
+// NewConfig creates a Config instance.
 func NewConfig(opts ...ConfigOption) *Config {
 	var (
 		defaultFS       = afero.NewOsFs()
@@ -46,7 +47,6 @@ func NewConfig(opts ...ConfigOption) *Config {
 		defaultLogLevel = zerolog.ErrorLevel
 	)
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(defaultLogLevel)
 	config := &Config{
 		ScanPath:   defaultScanPath,
@@ -77,7 +77,18 @@ func WithFS(fs afero.Fs) ConfigOption {
 
 func WithScanPath(path string) ConfigOption {
 	return func(c *Config) {
-		c.ScanPath = validate.Path(c.Filesystem, c.ScanPath)
+		if validate.PathExists(path) {
+			c.ScanPath = path
+			return
+		}
+
+		currentDir, err := os.Getwd()
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to get current dir")
+		}
+
+		log.Error().Msgf("scan path %q not found, defaulting to %q", path, currentDir)
+		c.ScanPath = currentDir
 	}
 }
 

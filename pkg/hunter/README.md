@@ -6,7 +6,7 @@
 import "github.com/brittonhayes/pillager/pkg/hunter"
 ```
 
-Package hunter contains secret hunting and file scanning tools
+Package hunter contains secret hunting and file scanning tools\.
 
 ## Index
 
@@ -28,7 +28,7 @@ Package hunter contains secret hunting and file scanning tools
   - [func (h *Hunter) Report(w io.Writer, findings []report.Finding) error](<#func-hunter-report>)
 
 
-## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L22-L33>)
+## type [Config](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L21-L32>)
 
 Config takes all of the configurable parameters for a Hunter\.
 
@@ -47,67 +47,71 @@ type Config struct {
 }
 ```
 
-### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L37>)
+### func [NewConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L38>)
 
 ```go
 func NewConfig(opts ...ConfigOption) *Config
 ```
 
+NewConfig creates a Config instance\.
+
 ## type [ConfigOption](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L35>)
+
+ConfigOption is a convenient type alias for func\(\*Config\)\.
 
 ```go
 type ConfigOption func(*Config)
 ```
 
-### func [WithFS](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L72>)
+### func [WithFS](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L73>)
 
 ```go
 func WithFS(fs afero.Fs) ConfigOption
 ```
 
-### func [WithFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L112>)
+### func [WithFormat](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L113>)
 
 ```go
 func WithFormat(reporter format.Reporter) ConfigOption
 ```
 
-### func [WithGitleaksConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L132>)
+### func [WithGitleaksConfig](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L133>)
 
 ```go
 func WithGitleaksConfig(g config.Config) ConfigOption
 ```
 
-### func [WithLogLevel](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L84>)
+### func [WithLogLevel](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L85>)
 
 ```go
 func WithLogLevel(level string) ConfigOption
 ```
 
-### func [WithRedact](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L106>)
+### func [WithRedact](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L107>)
 
 ```go
 func WithRedact(redact bool) ConfigOption
 ```
 
-### func [WithScanPath](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L78>)
+### func [WithScanPath](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L79>)
 
 ```go
 func WithScanPath(path string) ConfigOption
 ```
 
-### func [WithTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L125>)
+### func [WithTemplate](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L126>)
 
 ```go
 func WithTemplate(template string) ConfigOption
 ```
 
-### func [WithVerbose](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L94>)
+### func [WithVerbose](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L95>)
 
 ```go
 func WithVerbose(verbose bool) ConfigOption
 ```
 
-### func [WithWorkers](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L100>)
+### func [WithWorkers](<https://github.com/brittonhayes/pillager/blob/main/pkg/hunter/config.go#L101>)
 
 ```go
 func WithWorkers(count int) ConfigOption

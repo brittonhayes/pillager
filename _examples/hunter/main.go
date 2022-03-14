@@ -28,8 +28,7 @@ func main() {
 	}
 
 	// Report results
-	err = h.Report(os.Stdout, results)
-	if err != nil {
+	if err = h.Report(os.Stdout, results); err != nil {
 		log.Fatal().Err(err).Send()
 	}
 }

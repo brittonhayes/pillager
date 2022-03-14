@@ -77,13 +77,13 @@ type HTMLTable struct{}
 func (h HTMLTable) Report(w io.Writer, findings []report.Finding) error
 ```
 
-## type [JSON](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L18>)
+## type [JSON](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L19>)
 
 ```go
 type JSON struct{}
 ```
 
-### func \(JSON\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L20>)
+### func \(JSON\) [Report](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L21>)
 
 ```go
 func (j JSON) Report(w io.Writer, findings []report.Finding) error
@@ -101,7 +101,9 @@ type Markdown struct{}
 func (m Markdown) Report(w io.Writer, findings []report.Finding) error
 ```
 
-## type [Reporter](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L14-L16>)
+## type [Reporter](<https://github.com/brittonhayes/pillager/blob/main/pkg/format/report.go#L15-L17>)
+
+Reporter is the interface that each of the canonical output formats implement\.
 
 ```go
 type Reporter interface {
