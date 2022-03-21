@@ -11,6 +11,8 @@ func StringToReporter(s string) Reporter {
 	switch strings.ToLower(s) {
 	case "json":
 		return JSON{}
+	case "raw":
+		return Raw{}
 	case "yaml":
 		return YAML{}
 	case "toml":

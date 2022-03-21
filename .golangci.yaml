@@ -6,7 +6,6 @@ linters:
     - godot
     - godox
     - dupl
-    - exhaustive
     - funlen
     - gocritic
     - goprintffuncname
