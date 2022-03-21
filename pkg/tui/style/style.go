@@ -8,13 +8,13 @@ import (
 var (
 	styleBase = lipgloss.NewStyle().Align(lipgloss.Left).Foreground(theme.Nord.Primary.Foreground)
 
-	Header = lipgloss.NewStyle().Padding(2, 0).Align(lipgloss.Left)
+	Header = lipgloss.NewStyle().Padding(1, 0).Align(lipgloss.Left)
 
 	Title    = styleBase.Copy().Bold(true).Foreground(theme.Nord.Normal.Cyan)
 	Subtitle = Title.Copy().Bold(false).Italic(true).Foreground(theme.Nord.Primary.Foreground)
 
 	Text      = styleBase.Copy().Padding(0).Bold(false)
-	Error     = styleBase.Copy().Foreground(theme.Nord.Normal.Yellow)
+	Error     = styleBase.Copy().MarginLeft(2).Foreground(theme.Nord.Normal.Yellow)
 	Faint     = styleBase.Copy().Foreground(theme.Nord.Primary.DimForeground).Faint(true)
 	Spinner   = styleBase.Copy().Foreground(theme.Nord.Bright.Cyan)
 	Highlight = lipgloss.NewStyle().Foreground(theme.Nord.Normal.Cyan)

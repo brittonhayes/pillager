@@ -96,7 +96,8 @@ var huntCmd = &cobra.Command{
 }
 
 func runInteractive(h *hunter.Hunter) error {
-	p := tea.NewProgram(model.NewModel(h), tea.WithAltScreen())
+	m := model.NewModel(h)
+	p := tea.NewProgram(m, tea.WithAltScreen())
 	return p.Start()
 }
 

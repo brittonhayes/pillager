@@ -2,12 +2,13 @@ package model
 
 import (
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/brittonhayes/pillager/pkg/tui/style"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/zricethezav/gitleaks/v8/report"
 )
 
 func (m model) Init() tea.Cmd {
@@ -27,7 +28,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
-
 	case resultsMsg:
 		m.loading.active = false
 		m.results = msg.results
@@ -36,22 +36,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case errMsg:
-		// There was an error. Note it in the model. And tell the runtime
-		// we're done and want to quit.
 		m.err = msg.err
-		time.Sleep(3 * time.Second)
-		return m, tea.Quit
+		return m, nil
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keymap.quit):
+		case key.Matches(msg, m.keymap.Quit):
 			return m, tea.Quit
 
-		case key.Matches(msg, m.keymap.filter):
-			m.table = m.table.StartFilterTyping()
+		case key.Matches(msg, m.keymap.Inspect):
+			m.body.selected.visible = !m.body.selected.visible
 			return m, nil
 
-		case key.Matches(msg, m.keymap.start):
+		case key.Matches(msg, m.keymap.Help):
+			m.help.ShowAll = !m.help.ShowAll
+			return m, nil
+
+		case key.Matches(msg, m.keymap.Start):
 			m.loading.active = true
 			return m, tea.Batch(startScan(m.hunter), m.loading.spinner.Tick)
 		default:
@@ -62,19 +63,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
+func (m model) selectedView() string {
+	if m.results != nil && m.body.selected.visible {
+		w := &strings.Builder{}
+		err := m.hunter.Report(w, []report.Finding{m.selectedRow()})
+		if err != nil {
+			m.err = err
+		}
+
+		selected := style.Faint.Italic(true).Render(fmt.Sprintf("\nCurrent selection:\n%s", w.String()))
+		return selected
+	}
+	return ""
+}
+
+func (m model) selectedRow() report.Finding {
+	return m.results[m.table.HighlightedRow().Data[columnKeyID].(int)-1]
+}
+
 func (m model) View() string {
-	// If there's an error, print it out and don't do anything else.
 	if m.err != nil {
-		return style.Error.Render(fmt.Sprintf("\n Uh oh! Something went\n%s\n\n", m.err))
+		return m.err.Error()
 	}
 
 	m.body.toast = ""
 	if m.loading.active || m.loading.spinner.Visible() {
-		m.body.message = fmt.Sprintf("Scanning for secrets in %q with %d workers %s", m.hunter.ScanPath, m.hunter.Workers, m.loading.spinner.View())
+		m.body.message = fmt.Sprintf("%s Scanning for secrets in %q with %d workers", m.loading.spinner.View(), m.hunter.ScanPath, m.hunter.Workers)
 	} else if m.results != nil {
-
 		m.body.toast = style.Highlight.Render(fmt.Sprintf("Found %d secrets in path %q", len(m.results), m.hunter.ScanPath))
 		m.body.message = m.table.View()
+		m.body.message += m.selectedView()
 	}
 
 	title := style.Title.Render(m.header.title)
@@ -82,10 +100,10 @@ func (m model) View() string {
 	header := style.Header.Render(title + "\n" + subtitle)
 
 	message := style.Text.Render(m.body.message)
-	body := lipgloss.JoinVertical(lipgloss.Top, m.body.toast, message)
+	body := lipgloss.JoinVertical(lipgloss.Top, m.body.toast, message, m.body.selected.text)
 
-	help := style.Faint.MarginTop(2).Render(m.footer.help.View(m.keymap))
-	footer := lipgloss.JoinVertical(lipgloss.Top, help)
+	help := m.help.View(m.keymap)
+	footer := help
 
 	return lipgloss.JoinVertical(lipgloss.Top, header, body, footer)
 }

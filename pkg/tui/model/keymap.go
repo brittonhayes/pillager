@@ -7,24 +7,34 @@ import (
 )
 
 type keymap struct {
-	filter key.Binding
-	start  key.Binding
-	quit   key.Binding
+	Filter  key.Binding
+	Inspect key.Binding
+	Start   key.Binding
+	Quit    key.Binding
+	Help    key.Binding
 }
 
 func newKeyMap() keymap {
 	k := keymap{
-		filter: key.NewBinding(
-			key.WithKeys(tea.KeyCtrlI.String()),
-			key.WithHelp("ctrl+i", "filter"),
+		Inspect: key.NewBinding(
+			key.WithKeys("i"),
+			key.WithHelp("i", "inspect"),
 		),
-		start: key.NewBinding(
+		Filter: key.NewBinding(
+			key.WithKeys("f"),
+			key.WithHelp("f", "filter"),
+		),
+		Start: key.NewBinding(
 			key.WithKeys(tea.KeyEnter.String()),
-			key.WithHelp("enter", "start"),
+			key.WithHelp("enter", "scan"),
 		),
-		quit: key.NewBinding(
-			key.WithKeys("q", "ctrl+c"),
-			key.WithHelp("q", "quit"),
+		Quit: key.NewBinding(
+			key.WithKeys("ctrl+c", "q", tea.KeyEsc.String()),
+			key.WithHelp("ctrl+c/esc/q", "quit"),
+		),
+		Help: key.NewBinding(
+			key.WithKeys("?"),
+			key.WithHelp("?", "help"),
 		),
 	}
 
@@ -38,12 +48,12 @@ func newKeyMap() keymap {
 // key.Map interface.
 func (k keymap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.start, k.quit},
-		{k.filter},
+		{k.Help, k.Start, k.Inspect},
+		{k.Quit},
 	}
 }
 
 // ShortHelp returns keybindings for the short help view.
 func (k keymap) ShortHelp() []key.Binding {
-	return []key.Binding{k.start, k.quit}
+	return []key.Binding{k.Help, k.Start, k.Inspect, k.Quit}
 }
