@@ -10,7 +10,8 @@ import (
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/hunter"
 	"github.com/brittonhayes/pillager/pkg/rules"
-	"github.com/brittonhayes/pillager/pkg/tui"
+	"github.com/brittonhayes/pillager/pkg/tui/model"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -95,9 +96,8 @@ var huntCmd = &cobra.Command{
 }
 
 func runInteractive(h *hunter.Hunter) error {
-	h.Verbose = false
-	h.Debug = false
-	return tui.Run(h)
+	p := tea.NewProgram(model.NewModel(h), tea.WithAltScreen())
+	return p.Start()
 }
 
 func init() {
