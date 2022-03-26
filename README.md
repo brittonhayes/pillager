@@ -79,9 +79,9 @@ Pillager provides a terminal user interface built with [bubbletea](https://githu
 ### Gitleaks Rules
 
 Pillager provides full support for Gitleaks[^gitleaks] rules. This can either be passed
-in with a rules.toml[^rules.toml] file, or you can use the default ruleset by leaving the rules flag blank.
+in with a rules.toml[^1] file, or you can use the default ruleset by leaving the rules flag blank.
 
-[rules.toml]: https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml
+[^1]: [Gitleaks Rules Reference](https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml)
 
 ```toml
 # rules.toml
@@ -241,7 +241,7 @@ Some examples include `kubectl`, `hugo`, and Github's `gh` CLI.
 
 **What is Gitleaks?**
 
-> Gitleaks is a SAST tool for detecting hardcoded secrets like passwords, api keys, and tokens in git repos.
+> Gitleaks[^2] is a SAST tool for detecting hardcoded secrets like passwords, api keys, and tokens in git repos.
 
 Gitleaks is an amazing tool for secret leak prevention. If you haven't implemented Gitleaks as a pre-commit checker,
 it's worth your time to check it out.
@@ -255,7 +255,7 @@ Gitleaks while taking a different approach to presenting and handling the secret
 baseline set of default rules, Pillager becomes much more powerful if you allow users to create rules for their own
 use-cases.
 
-Check out the included [^rules.toml] for a baseline ruleset.
+Check out the included rules[^1] for a baseline ruleset.
 
 ---
 
@@ -265,9 +265,9 @@ Check out the included [^rules.toml] for a baseline ruleset.
 > to scan for secrets on any systems before doing so.
 >
 > At it's core, Pillager is designed to assist you in determining if a system is affected by common sources of credential leakage as documented
-> by the MITRE ATT&CK framework.
+> by the MITRE ATT&CK[^3] framework.
 >
-> [mitre]: https://attack.mitre.org
+> [^3]: [MITRE ATT&CK Website](https://attack.mitre.org)
 >
 > [MITRE ATT&CK Technique - T1552,003 - Unsecured Credentials: Bash History ](https://attack.mitre.org/techniques/T1552/003/)
 >
