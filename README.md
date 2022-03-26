@@ -2,10 +2,6 @@
 
 ![Image](./logo.png)
 
-<a href="https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU?t=6&autoplay=1">
-    <img src="https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU/10.png" width="500"/>
-</a>
-
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
@@ -72,6 +68,8 @@ pillager
 # From any subcommand
 pillager [cmd] --help
 ```
+
+[![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU)
 
 ## Configuration
 
