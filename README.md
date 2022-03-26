@@ -1,6 +1,6 @@
 # Pillager
 
-![Image](./logo.png)
+![Image](./logo.png | width=200)
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
@@ -65,6 +65,10 @@ pillager
 # From any subcommand
 pillager [cmd] --help
 ```
+
+## User Interface
+
+Pillager provides a terminal user interface built with [bubbletea](https://github.com/charmbracelet/bubbletea) if you'd like to scan for secrets interactively.
 
 [![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU)
 
