@@ -3,9 +3,11 @@
 <img src="./logo.png" width="700">
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
+![Latest Release](https://img.shields.io/github/v/release/brittonhayes/pillager?label=latest%20release)
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
 ![Tests](https://github.com/brittonhayes/pillager/workflows/test/badge.svg)
-![Latest Release](https://img.shields.io/github/v/release/brittonhayes/pillager?label=latest%20release)
+
+Pillage filesystems for sensitive information with Go.
 
 ## Table of Contents
 
