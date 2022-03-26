@@ -28,6 +28,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.help.Width = msg.Width
+
 	case resultsMsg:
 		m.loading.active = false
 		m.results = msg.results
@@ -103,7 +106,6 @@ func (m model) View() string {
 	body := lipgloss.JoinVertical(lipgloss.Top, m.body.toast, message, m.body.selected.text)
 
 	help := m.help.View(m.keymap)
-	footer := help
 
-	return lipgloss.JoinVertical(lipgloss.Top, header, body, footer)
+	return lipgloss.JoinVertical(lipgloss.Top, header, body, help)
 }

@@ -58,7 +58,7 @@ tasks:
   install:
     desc: install executable
     cmds:
-      - go install github.com/brittonhayes/pillager@latest
+      - go install github.com/brittonhayes/pillager/cmd/pillager@latest
 
   run:
     desc: run the executable

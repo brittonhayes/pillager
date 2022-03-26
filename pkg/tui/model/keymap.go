@@ -3,7 +3,6 @@ package model
 import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 type keymap struct {
@@ -25,12 +24,12 @@ func newKeyMap() keymap {
 			key.WithHelp("f", "filter"),
 		),
 		Start: key.NewBinding(
-			key.WithKeys(tea.KeyEnter.String()),
+			key.WithKeys("enter"),
 			key.WithHelp("enter", "scan"),
 		),
 		Quit: key.NewBinding(
-			key.WithKeys("ctrl+c", "q", tea.KeyEsc.String()),
-			key.WithHelp("ctrl+c/esc/q", "quit"),
+			key.WithKeys("ctrl+c", "q"),
+			key.WithHelp("ctrl+c/q", "quit"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys("?"),
@@ -48,8 +47,8 @@ func newKeyMap() keymap {
 // key.Map interface.
 func (k keymap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Help, k.Start, k.Inspect},
-		{k.Quit},
+		{k.Help, k.Start, k.Inspect, k.Quit},
+		{k.Quit, k.Filter},
 	}
 }
 

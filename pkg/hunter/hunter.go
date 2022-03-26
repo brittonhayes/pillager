@@ -24,10 +24,18 @@ func New(opts ...ConfigOption) (*Hunter, error) {
 
 // Hunt walks over the filesystem at the configured path, looking for sensitive information.
 func (h *Hunter) Hunt() ([]report.Finding, error) {
-	output := detect.Options{Verbose: h.Verbose, Redact: h.Redact}
-	conf := config.Config{Allowlist: h.Gitleaks.Allowlist, Rules: h.Gitleaks.Rules}
+	d, err := detect.NewDetectorDefaultConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to setup hunter")
+	}
 
-	findings, err := detect.FromFiles(h.ScanPath, conf, output)
+	d.Verbose = h.Verbose
+	d.Redact = h.Redact
+	if h.Config != nil {
+		d.Config = config.Config{Allowlist: h.Gitleaks.Allowlist, Rules: h.Gitleaks.Rules}
+	}
+
+	findings, err := d.DetectFiles(h.ScanPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to detect from files")
 	}

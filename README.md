@@ -1,14 +1,13 @@
 # Pillager
 
-![Image](./logo.png)
+<img src="./logo.png" width="700">
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
-
+![Latest Release](https://img.shields.io/github/v/release/brittonhayes/pillager?label=latest%20release)
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
-
 ![Tests](https://github.com/brittonhayes/pillager/workflows/test/badge.svg)
 
-![Latest Release](https://img.shields.io/github/v/release/brittonhayes/pillager?label=latest%20release)
+Pillage filesystems for sensitive information with Go.
 
 ## Table of Contents
 
@@ -69,30 +68,40 @@ pillager
 pillager [cmd] --help
 ```
 
+## User Interface
+
+Pillager provides a terminal user interface built with [bubbletea](https://github.com/charmbracelet/bubbletea) if you'd like to scan for secrets interactively.
+
+[![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU)
+
 ## Configuration
 
 ### Gitleaks Rules
 
-Pillager provides full support for [Gitleaks](https://github.com/zricethezav/gitleaks) rules. This can either be passed
-in with a [rules.toml](./rules.toml) file, or you can use the default ruleset by leaving the rules flag blank.
+Pillager provides full support for Gitleaks[^gitleaks] rules. This can either be passed
+in with a rules.toml[^rules.toml] file, or you can use the default ruleset by leaving the rules flag blank.
+
+[rules.toml]: https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml
 
 ```toml
 # rules.toml
 title = "pillager rules"
 
 [[rules]]
-description = "AWS Access Key"
-regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
-tags = ["key", "AWS"]
-[[rules.entropies]]
-Min = "3.5"
-Max = "4.5"
-Group = "1"
+id = "gitlab-pat"
+description = "GitLab Personal Access Token"
+regex = '''glpat-[0-9a-zA-Z\-\_]{20}'''
 
 [[rules]]
-description = "Email Address"
-regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
-tags = ["email", "User Info"]
+id = "aws-access-token"
+description = "AWS"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+
+# Cryptographic keys
+[[rules]]
+id = "PKCS8-PK"
+description = "PKCS8 private key"
+regex = '''-----BEGIN PRIVATE KEY-----'''
 ```
 
 ### Built-in Output Formats
@@ -239,12 +248,14 @@ it's worth your time to check it out.
 
 **Why is Gitleaks relevant to Pillager?**
 
+[gitleaks]: https://github.com/zricethezav/gitleaks
+
 Pillager implements the powerful [rules](https://github.com/zricethezav/gitleaks#rules-summary) functionality of
 Gitleaks while taking a different approach to presenting and handling the secrets found. While I have provided a
 baseline set of default rules, Pillager becomes much more powerful if you allow users to create rules for their own
 use-cases.
 
-Check out the included [rules.toml](./rules.toml) for a baseline ruleset.
+Check out the included [^rules.toml] for a baseline ruleset.
 
 ---
 
@@ -255,6 +266,8 @@ Check out the included [rules.toml](./rules.toml) for a baseline ruleset.
 >
 > At it's core, Pillager is designed to assist you in determining if a system is affected by common sources of credential leakage as documented
 > by the MITRE ATT&CK framework.
+>
+> [mitre]: https://attack.mitre.org
 >
 > [MITRE ATT&CK Technique - T1552,003 - Unsecured Credentials: Bash History ](https://attack.mitre.org/techniques/T1552/003/)
 >
