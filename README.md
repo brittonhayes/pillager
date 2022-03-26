@@ -81,7 +81,7 @@ Pillager provides a terminal user interface built with [bubbletea](https://githu
 Pillager provides full support for Gitleaks[^gitleaks] rules. This can either be passed
 in with a rules.toml[^1] file, or you can use the default ruleset by leaving the rules flag blank.
 
-[1]: https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml
+[^1]: [rules.toml](https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml)
 
 ```toml
 # rules.toml
