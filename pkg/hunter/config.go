@@ -12,17 +12,14 @@ import (
 
 	"github.com/brittonhayes/pillager/pkg/format"
 	"github.com/brittonhayes/pillager/pkg/rules"
-	"github.com/spf13/afero"
 
 	"github.com/zricethezav/gitleaks/v8/config"
 )
 
 // Config takes all of the configurable parameters for a Hunter.
 type Config struct {
-	Filesystem afero.Fs
-	Reporter   format.Reporter
-	Gitleaks   config.Config
-
+	Reporter format.Reporter
+	Gitleaks config.Config
 	ScanPath string
 	Verbose  bool
 	Redact   bool
@@ -37,7 +34,6 @@ type ConfigOption func(*Config)
 // NewConfig creates a Config instance.
 func NewConfig(opts ...ConfigOption) *Config {
 	var (
-		defaultFS       = afero.NewOsFs()
 		defaultVerbose  = false
 		defaultScanPath = "."
 		defaultReporter = format.JSON{}
@@ -49,13 +45,12 @@ func NewConfig(opts ...ConfigOption) *Config {
 
 	zerolog.SetGlobalLevel(defaultLogLevel)
 	config := &Config{
-		ScanPath:   defaultScanPath,
-		Filesystem: defaultFS,
-		Reporter:   defaultReporter,
-		Workers:    defaultWorkers,
-		Gitleaks:   defaultGitleaks,
-		Verbose:    defaultVerbose,
-		Template:   defaultTemplate,
+		ScanPath: defaultScanPath,
+		Reporter: defaultReporter,
+		Workers:  defaultWorkers,
+		Gitleaks: defaultGitleaks,
+		Verbose:  defaultVerbose,
+		Template: defaultTemplate,
 	}
 
 	for _, opt := range opts {
@@ -67,12 +62,6 @@ func NewConfig(opts ...ConfigOption) *Config {
 	}
 
 	return config
-}
-
-func WithFS(fs afero.Fs) ConfigOption {
-	return func(c *Config) {
-		c.Filesystem = fs
-	}
 }
 
 func WithScanPath(path string) ConfigOption {
@@ -147,10 +136,6 @@ func WithGitleaksConfig(g config.Config) ConfigOption {
 }
 
 func (c *Config) validate() error {
-	if c.Filesystem == nil {
-		return errors.New("missing filesystem in Config")
-	}
-
 	if c.Gitleaks.Rules == nil {
 		return errors.New("no gitleaks rules provided")
 	}

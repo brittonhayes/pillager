@@ -58,14 +58,3 @@ func limit(w, max int) int {
 
 	return w
 }
-
-func truncate(s string, width int) string {
-	t := s
-	if len(s) > width {
-		if width > 3 {
-			width -= 3
-		}
-		t = "..." + s[width:]
-	}
-	return t
-}

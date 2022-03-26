@@ -2,6 +2,8 @@
 
 ![Image](./logo.png)
 
+[![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU?t=6)
+
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
@@ -73,8 +75,10 @@ pillager [cmd] --help
 
 ### Gitleaks Rules
 
-Pillager provides full support for [Gitleaks](https://github.com/zricethezav/gitleaks) rules. This can either be passed
-in with a [rules.toml](./rules.toml) file, or you can use the default ruleset by leaving the rules flag blank.
+Pillager provides full support for Gitleaks[^gitleaks] rules. This can either be passed
+in with a rules.toml[^rules.toml] file, or you can use the default ruleset by leaving the rules flag blank.
+
+[rules.toml]: https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml
 
 ```toml
 # rules.toml
@@ -239,12 +243,14 @@ it's worth your time to check it out.
 
 **Why is Gitleaks relevant to Pillager?**
 
+[gitleaks]: https://github.com/zricethezav/gitleaks
+
 Pillager implements the powerful [rules](https://github.com/zricethezav/gitleaks#rules-summary) functionality of
 Gitleaks while taking a different approach to presenting and handling the secrets found. While I have provided a
 baseline set of default rules, Pillager becomes much more powerful if you allow users to create rules for their own
 use-cases.
 
-Check out the included [rules.toml](./rules.toml) for a baseline ruleset.
+Check out the included [^rules.toml] for a baseline ruleset.
 
 ---
 
@@ -255,6 +261,8 @@ Check out the included [rules.toml](./rules.toml) for a baseline ruleset.
 >
 > At it's core, Pillager is designed to assist you in determining if a system is affected by common sources of credential leakage as documented
 > by the MITRE ATT&CK framework.
+>
+> [mitre]: https://attack.mitre.org
 >
 > [MITRE ATT&CK Technique - T1552,003 - Unsecured Credentials: Bash History ](https://attack.mitre.org/techniques/T1552/003/)
 >

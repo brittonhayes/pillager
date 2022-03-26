@@ -17,8 +17,7 @@ const ErrReadConfig = "Failed to read gitleaks config"
 
 // These strings contain default configs. They are initialized at compile time via go:embed.
 var (
-	//go:embed rules_simple.toml
-	RulesDefault string
+	RulesDefault = config.DefaultConfig
 
 	//go:embed rules_strict.toml
 	RulesStrict string
@@ -69,7 +68,7 @@ func (l *Loader) Load() config.Config {
 func WithFile(file string) LoaderOption {
 	return func(l *Loader) {
 		if file == "" {
-			if _, err := toml.Decode(RulesDefault, &l.loader); err != nil {
+			if _, err := toml.Decode(config.DefaultConfig, &l.loader); err != nil {
 				log.Fatal().Err(err).Msg(ErrReadConfig)
 			}
 			return
