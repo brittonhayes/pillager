@@ -1,6 +1,6 @@
 # Pillager
 
-<img src="./logo.png" width="550">
+<img src="./logo.png" width="700">
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/brittonhayes/pillager.svg)](https://pkg.go.dev/github.com/brittonhayes/pillager)
 [![Go Report Card](https://goreportcard.com/badge/github.com/brittonhayes/pillager)](https://goreportcard.com/report/github.com/brittonhayes/pillager)
