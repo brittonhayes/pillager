@@ -88,18 +88,20 @@ in with a rules.toml[^rules.toml] file, or you can use the default ruleset by le
 title = "pillager rules"
 
 [[rules]]
-description = "AWS Access Key"
-regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
-tags = ["key", "AWS"]
-[[rules.entropies]]
-Min = "3.5"
-Max = "4.5"
-Group = "1"
+id = "gitlab-pat"
+description = "GitLab Personal Access Token"
+regex = '''glpat-[0-9a-zA-Z\-\_]{20}'''
 
 [[rules]]
-description = "Email Address"
-regex = '''(?i)([A-Za-z0-9!#$%&'*+\/=?^_{|.}~-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)'''
-tags = ["email", "User Info"]
+id = "aws-access-token"
+description = "AWS"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+
+# Cryptographic keys
+[[rules]]
+id = "PKCS8-PK"
+description = "PKCS8 private key"
+regex = '''-----BEGIN PRIVATE KEY-----'''
 ```
 
 ### Built-in Output Formats
