@@ -78,7 +78,7 @@ Pillager provides a terminal user interface built with [bubbletea](https://githu
 
 ### Gitleaks Rules
 
-Pillager provides full support for Gitleaks[^gitleaks] rules. This can either be passed
+Pillager provides full support for Gitleaks[^2] rules. This can either be passed
 in with a rules.toml[^1] file, or you can use the default ruleset by leaving the rules flag blank.
 
 [^1]: [Gitleaks Rules Reference](https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml)
@@ -248,7 +248,7 @@ it's worth your time to check it out.
 
 **Why is Gitleaks relevant to Pillager?**
 
-[gitleaks]: https://github.com/zricethezav/gitleaks
+[^2]: [Gitleaks](https://github.com/zricethezav/gitleaks)
 
 Pillager implements the powerful [rules](https://github.com/zricethezav/gitleaks#rules-summary) functionality of
 Gitleaks while taking a different approach to presenting and handling the secrets found. While I have provided a
