@@ -90,8 +90,8 @@ github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1m
 github.com/envoyproxy/go-control-plane v0.9.7/go.mod h1:cwu0lG7PUMfa9snN8LXBig5ynNVH9qI8YYLbd1fK2po=
 github.com/envoyproxy/go-control-plane v0.9.9-0.20201210154907-fd9021fe5dad/go.mod h1:cXg6YxExXjJnVBQHBLXeUAgxn2UodCpnH306RInaBQk=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
-github.com/evertras/bubble-table v0.8.4 h1:8VP8IPHASriMQuQYu69PWayHfPNAB3KM8nSwaS6spJ4=
-github.com/evertras/bubble-table v0.8.4/go.mod h1:OZq5XdGas3p4OZi/if0NLoAeIlgpCDvCgcGG6lD4oGY=
+github.com/evertras/bubble-table v0.11.1 h1:eDid2sGBpHuAFroY1rhf3qxl8T8oIxV91p5OMt/KmGg=
+github.com/evertras/bubble-table v0.11.1/go.mod h1:EFrfvq4NqgZAqFEILLih/GxHzvCfJpX9JzXPirBEXUI=
 github.com/fatih/semgroup v1.2.0 h1:h/OLXwEM+3NNyAdZEpMiH1OzfplU09i2qXPVThGZvyg=
 github.com/fatih/semgroup v1.2.0/go.mod h1:1KAD4iIYfXjE4U13B48VM4z9QUwV5Tt8O4rS879kgm8=
 github.com/fsnotify/fsnotify v1.5.1 h1:mZcQUHVQUQWoPXXtuf9yuEXKudkV2sx1E06UadKWpgI=

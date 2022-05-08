@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/bubbles v0.10.3
 	github.com/charmbracelet/bubbletea v0.20.0
 	github.com/charmbracelet/lipgloss v0.5.0
-	github.com/evertras/bubble-table v0.8.4
+	github.com/evertras/bubble-table v0.11.1
 	github.com/gookit/color v1.5.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
