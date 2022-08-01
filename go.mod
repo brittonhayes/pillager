@@ -16,7 +16,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
-	github.com/zricethezav/gitleaks/v8 v8.8.4
+	github.com/zricethezav/gitleaks/v8 v8.9.0
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed
 	gopkg.in/yaml.v2 v2.4.0
 )
