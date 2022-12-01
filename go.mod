@@ -16,7 +16,7 @@ require (
 	github.com/rs/zerolog v1.28.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
-	github.com/zricethezav/gitleaks/v8 v8.8.4
+	github.com/zricethezav/gitleaks/v8 v8.15.1
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -28,7 +28,7 @@ require (
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/fatih/semgroup v1.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/gitleaks/go-gitdiff v0.7.6 // indirect
+	github.com/gitleaks/go-gitdiff v0.8.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
