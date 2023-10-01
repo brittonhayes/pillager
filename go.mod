@@ -3,7 +3,7 @@ module github.com/brittonhayes/pillager
 go 1.18
 
 require (
-	github.com/BurntSushi/toml v1.1.0
+	github.com/BurntSushi/toml v1.3.2
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/brittonhayes/glitter v0.2.0
 	github.com/charmbracelet/bubbles v0.10.3
