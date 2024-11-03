@@ -57,7 +57,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.keymap.Start):
 			m.loading.active = true
-			return m, tea.Batch(startScan(m.scanner, m.scanner.ScanPath), m.loading.spinner.Tick)
+			return m, tea.Batch(startScan(m.scanner), m.loading.spinner.Tick)
 		default:
 			return m, m.loading.spinner.Tick
 		}
@@ -91,9 +91,9 @@ func (m model) View() string {
 
 	m.body.toast = ""
 	if m.loading.active || m.loading.spinner.Visible() {
-		m.body.message = fmt.Sprintf("%s Scanning for secrets in %q with %d workers", m.loading.spinner.View(), m.scanner.ScanPath, m.scanner.Workers)
+		m.body.message = fmt.Sprintf("%s Scanning for secrets in %q", m.loading.spinner.View(), m.scanner.ScanPath())
 	} else if m.results != nil {
-		m.body.toast = style.Highlight.Render(fmt.Sprintf("Found %d secrets in path %q", len(m.results), m.scanner.ScanPath))
+		m.body.toast = style.Highlight.Render(fmt.Sprintf("Found %d secrets in path %q", len(m.results), m.scanner.ScanPath()))
 		m.body.message = m.table.View()
 		m.body.message += m.selectedView()
 	}

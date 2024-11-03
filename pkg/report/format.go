@@ -14,6 +14,17 @@ type JSON struct{}
 
 func (j JSON) Report(w io.Writer, findings []pillager.Finding) error {
 	encoder := json.NewEncoder(w)
+	if err := encoder.Encode(&findings); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type JSONPretty struct{}
+
+func (j JSONPretty) Report(w io.Writer, findings []pillager.Finding) error {
+	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(&findings); err != nil {
 		return err

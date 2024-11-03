@@ -5,6 +5,8 @@ import (
 	"strings"
 	"text/template"
 
+	"encoding/json"
+
 	"github.com/Masterminds/sprig"
 	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/internal/templates"
@@ -23,6 +25,8 @@ func StringToReporter(s string) Reporter {
 	switch strings.ToLower(s) {
 	case "json":
 		return JSON{}
+	case "json-pretty":
+		return JSONPretty{}
 	case "raw":
 		return Raw{}
 	case "yaml":
@@ -52,7 +56,19 @@ func Render(w io.Writer, tpl string, findings []pillager.Finding) error {
 		tpl = templates.DefaultTemplate
 	}
 
-	t, err := t.Funcs(sprig.TxtFuncMap()).Parse(tpl)
+	funcMap := sprig.TxtFuncMap()
+	funcMap["json"] = func(v interface{}) string {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return ""
+		}
+		// Escape quotes and backslashes for HTML attributes
+		escaped := strings.ReplaceAll(string(b), `"`, `&quot;`)
+		escaped = strings.ReplaceAll(escaped, `\`, `\\`)
+		return escaped
+	}
+
+	t, err := t.Funcs(funcMap).Parse(tpl)
 	if err != nil {
 		return errors.Wrap(err, "failed to parse template")
 	}

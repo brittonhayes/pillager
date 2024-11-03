@@ -9,8 +9,11 @@ import (
 	"runtime"
 
 	"github.com/brittonhayes/pillager"
-	"github.com/brittonhayes/pillager/internal/scanner"
+	"github.com/brittonhayes/pillager/pkg/scanner"
+	"github.com/brittonhayes/pillager/pkg/tui/model"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +21,6 @@ var (
 	verbose     bool
 	redact      bool
 	level       string
-	rulesConfig string
 	reporter    string
 	templ       string
 	workers     int
@@ -56,7 +58,6 @@ var huntCmd = &cobra.Command{
 	Custom Go Template Format from Template File:
 		pillager hunt ./example --template "$(cat pkg/templates/simple.tmpl)"
 `,
-	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if level != "" {
 			lvl, err := zerolog.ParseLevel(level)
@@ -73,7 +74,6 @@ var huntCmd = &cobra.Command{
 				return fmt.Errorf("failed to load config: %w", err)
 			}
 			opts = &pillager.Options{
-				ScanPath: args[0],
 				Workers:  runtime.NumCPU(),
 				Verbose:  false,
 				Template: "",
@@ -82,9 +82,15 @@ var huntCmd = &cobra.Command{
 			}
 		}
 
+		// Get path from args if provided, otherwise use config path
+		scanPath := ""
+		if len(args) > 0 {
+			scanPath = args[0]
+		}
+
 		// Merge command line flags with config file
 		flagOpts := &pillager.Options{
-			ScanPath: args[0],
+			Path:     scanPath,
 			Redact:   redact,
 			Verbose:  verbose,
 			Workers:  workers,
@@ -93,29 +99,40 @@ var huntCmd = &cobra.Command{
 		}
 		configLoader.MergeWithFlags(opts, flagOpts)
 
+		// Check if path is provided either via args or config
+		if opts.Path == "" {
+			return fmt.Errorf("scan path must be provided either as an argument or in the config file")
+		}
+
 		s, err := scanner.NewGitleaksScanner(*opts)
 		if err != nil {
 			return fmt.Errorf("failed to create scanner: %w", err)
 		}
 
-		// if interactive {
-		// 	return runInteractive(scan)
-		// }
+		if interactive {
+			return runInteractive(s)
+		}
 
-		results, err := s.Scan(args[0])
+		results, err := s.Scan()
 		if err != nil {
 			return err
+		}
+
+		if len(results) == 0 {
+			fmt.Println("[]")
+			log.Debug().Msg("no secrets or sensitive information were found at the target directory")
+			return nil
 		}
 
 		return s.Reporter().Report(os.Stdout, results)
 	},
 }
 
-// func runInteractive(h *scanner.Hunter) error {
-// 	m := model.NewModel(h)
-// 	p := tea.NewProgram(m, tea.WithAltScreen())
-// 	return p.Start()
-// }
+func runInteractive(h scanner.Scanner) error {
+	m := model.NewModel(h)
+	p := tea.NewProgram(m, tea.WithAltScreen())
+	return p.Start()
+}
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
@@ -124,8 +141,7 @@ func init() {
 	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable scanner verbose output")
 	huntCmd.Flags().StringVarP(&level, "log-level", "l", "info", "set logging level")
 	huntCmd.Flags().StringVarP(&config, "config", "c", "", "path to pillager config file")
-	huntCmd.Flags().StringVarP(&rulesConfig, "rules", "r", "", "path to gitleaks rules.toml config")
-	huntCmd.Flags().StringVarP(&reporter, "format", "f", "json", "set secret reporter format (json, yaml)")
+	huntCmd.Flags().StringVarP(&reporter, "format", "f", "json-pretty", "set secret reporter format (json, yaml, html, html-table, table, markdown)")
 	huntCmd.Flags().BoolVar(&redact, "redact", false, "redact secret from results")
 	huntCmd.Flags().StringVarP(&templ, "template", "t", "", "set go text/template string for output format")
 }

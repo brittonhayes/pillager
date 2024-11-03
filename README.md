@@ -22,7 +22,7 @@ Pillager is designed to provide a simple means of leveraging Go's strong concurr
 directories for sensitive information in files. Pillager does this by standing on the shoulders
 of [a few giants](#shoulders-of-giants). Once pillager finds files that match the specified pattern, the file is scanned
 using a series of concurrent workers that each take a line of the file from the job queue and hunt for sensitive pattern
-matches. The available pattern filters can be defined in a rules.toml file or you can use the default ruleset.
+matches. The available pattern filters can be defined in a pillager.toml file or you can use the default ruleset.
 
 ## Installation
 
@@ -31,7 +31,7 @@ matches. The available pattern filters can be defined in a rules.toml file or yo
 If you have Go setup on your system, you can install Pillager with `go get`
 
 ```shell script
-go get github.com/brittonhayes/pillager
+go install github.com/brittonhayes/pillager@latest
 ```
 
 ### Scoop (Windows)
@@ -79,29 +79,56 @@ Pillager provides a terminal user interface built with [bubbletea](https://githu
 ### Gitleaks Rules
 
 Pillager provides full support for Gitleaks[^2] rules. This can either be passed
-in with a rules.toml[^1] file, or you can use the default ruleset by leaving the rules flag blank.
+in with a rules[^1] section in your pillager.toml file, or you can use the default ruleset by leaving the config flag blank.
 
 [^1]: [Gitleaks Rules Reference](https://github.com/zricethezav/gitleaks/blob/57f9bc83d169bea363f2990a4de334b54efc3d7d/config/gitleaks.toml)
 
 ```toml
-# rules.toml
-title = "pillager rules"
+# pillager.toml
+# Basic configuration
+verbose = false 
+path = "."
+workers = 4
+redact = true
+reporter = "json-pretty"
 
+# Rules for secret detection
 [[rules]]
-id = "gitlab-pat"
-description = "GitLab Personal Access Token"
-regex = '''glpat-[0-9a-zA-Z\-\_]{20}'''
-
-[[rules]]
-id = "aws-access-token"
-description = "AWS"
+description = "AWS Access Key"
+id = "aws-access-key"
 regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["aws", "credentials"]
 
-# Cryptographic keys
 [[rules]]
-id = "PKCS8-PK"
-description = "PKCS8 private key"
-regex = '''-----BEGIN PRIVATE KEY-----'''
+description = "AWS Secret Key"
+id = "aws-secret-key"
+regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["aws", "credentials"]
+
+[[rules]]
+description = "GitHub Token"
+id = "github-token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+tags = ["github", "token"]
+
+[[rules]]
+description = "Private Key"
+id = "private-key"
+regex = '''-----BEGIN (?:RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY( BLOCK)?-----'''
+tags = ["key", "private"]
+
+# Allowlist configuration
+[allowlist]
+paths = [
+    ".*/_test\\.go$",
+    ".*/testdata/.*",
+    ".*\\.md$",
+    ".*/vendor/.*"
+]
+regexes = [
+    "EXAMPLE_KEY",
+    "DUMMY_SECRET"
+] 
 ```
 
 ### Built-in Output Formats
@@ -132,10 +159,10 @@ pillager hunt ./example -f json | jq
 pillager hunt . -f yaml
 ```
 
-#### TOML
+#### JSON Pretty
 
 ```shell
-pillager hunt . -f toml
+pillager hunt . -f json-pretty
 ```
 
 #### HTML
@@ -171,14 +198,14 @@ pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
 #### Custom Go Template from File
 
 ```shell
-pillager hunt . -t "$(cat pkg/templates/simple.tmpl)"
+pillager hunt . -t "$(cat internal/templates/simple.tmpl)"
 ```
 
 </details>
 
 ### Custom Templates
 
-Pillager allows you to use powerful `go text/template` to customize the output format. Here are a few template examples.
+Pillager allows you to use powerful `go text/template` and [sprig](https://masterminds.github.io/sprig/) functions to customize the output format. Here are a few template examples.
 
 #### Basic
 
@@ -203,16 +230,11 @@ Pillager allows you to use powerful `go text/template` to customize the output f
 
 ```
 
-> More template examples can be found in the [templates](./pkg/templates) directory.
+> More template examples can be found in the [templates](./internal/templates) directory.
 
 ## Documentation
 
-:books: [View the docs](pkg/hunter)
-
-GoDoc documentation is available on [pkg.go.dev for pillager](https://pkg.go.dev/github.com/brittonhayes/pillager) but
-it is also available for all packages in the repository in markdown format. Just open the folder of any package, and
-you'll see the GoDocs rendered in beautiful Github-flavored markdown thanks to the
-awesome [gomarkdoc](https://github.com/princjef/gomarkdoc) tool.
+GoDoc documentation is available on [pkg.go.dev for pillager](https://pkg.go.dev/github.com/brittonhayes/pillager). 
 
 ## Development
 
@@ -237,7 +259,7 @@ If you've seen a CLI written in Go before, there's a pretty high chance it was b
 library enough. It empowers developers to make consistent, dynamic, and self-documenting command line tools with ease.
 Some examples include `kubectl`, `hugo`, and Github's `gh` CLI.
 
-#### [Gitleaks](https://github.com/zricethezav/gitleaks)
+#### [Gitleaks](https://github.com/gitleaks/gitleaks)
 
 **What is Gitleaks?**
 
@@ -248,9 +270,9 @@ it's worth your time to check it out.
 
 **Why is Gitleaks relevant to Pillager?**
 
-[^2]: [Gitleaks](https://github.com/zricethezav/gitleaks)
+[^2]: [Gitleaks](https://github.com/gitleaks/gitleaks)
 
-Pillager implements the powerful [rules](https://github.com/zricethezav/gitleaks#rules-summary) functionality of
+Pillager implements the powerful [rules](https://github.com/gitleaks/gitleaks#rules-summary) functionality of
 Gitleaks while taking a different approach to presenting and handling the secrets found. While I have provided a
 baseline set of default rules, Pillager becomes much more powerful if you allow users to create rules for their own
 use-cases.

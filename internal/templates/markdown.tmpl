@@ -1,6 +1,25 @@
-# Results
+# Pillager
+Results of your latest hunt from {{ now.Format "2006-01-02 15:04 MST" }}
+
+{{ len . }} Findings
 
 {{ range . -}}
-    ## {{ .File }}
-    - Location: {{.StartLine}}
+<details>
+<summary>Finding in `{{ .File }}` (Line {{ .StartLine }})</summary>
+
+- **Location**: Line {{ .StartLine }} to {{ .EndLine }}
+{{- if .RuleID }}
+- **Rule Matched**: {{ .RuleID }}
+{{- end }}
+{{- if .Description }}
+- **Description**: {{ .Description }}
+{{- end }}
+- **Secret**: {{ .Secret }}
+- **Match Context**: `{{ .Match }}`
+{{- if .StartColumn }}
+- **Position**: Column {{ .StartColumn }}
+{{- end }}
+
+</details>
+
 {{end}}

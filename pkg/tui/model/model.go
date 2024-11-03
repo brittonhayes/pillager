@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/brittonhayes/pillager"
-	"github.com/brittonhayes/pillager/internal/scanner"
+	"github.com/brittonhayes/pillager/pkg/scanner"
 	"github.com/brittonhayes/pillager/pkg/tui/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -22,7 +22,7 @@ type model struct {
 	help    help.Model
 	table   table.Model
 
-	scanner *scanner.Scanner
+	scanner scanner.Scanner
 	results []pillager.Finding
 	err     error
 
@@ -56,10 +56,10 @@ type resultsMsg struct{ results []pillager.Finding }
 type errMsg struct{ err error }
 
 func (e errMsg) Error() string {
-	return fmt.Sprintf("🔥 Uh oh! Well that's not good. Looks like something went wrong and the application has exited: \n\n%s\n\n%s", style.Error.Render(e.Error()), "Press [q] to quit.")
+	return fmt.Sprintf("🔥 Uh oh! Well that's not good. Looks like something went wrong and the application has exited: \n\n%s\n\n%s", style.Error.Render(e.err.Error()), "Press [q] to quit.")
 }
 
-func NewModel(scan *scanner.Scanner) model {
+func NewModel(scan scanner.Scanner) model {
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		width = 80
@@ -102,9 +102,9 @@ func (m model) Dimensions() (int, int) {
 	return m.width, m.height
 }
 
-func startScan(s scanner.Scanner, path string) tea.Cmd {
+func startScan(s scanner.Scanner) tea.Cmd {
 	return func() tea.Msg {
-		results, err := s.Scan(path)
+		results, err := s.Scan()
 		if err != nil {
 			// There was an error making our request. Wrap the error we received
 			// in a message and return it.

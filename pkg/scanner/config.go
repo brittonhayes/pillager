@@ -7,7 +7,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/brittonhayes/pillager"
-	"github.com/rs/zerolog/log"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/zricethezav/gitleaks/v8/config"
 )
@@ -21,47 +21,48 @@ type ConfigLoader struct {
 func NewConfigLoader() *ConfigLoader {
 	v := viper.New()
 	v.SetDefault("verbose", false)
-	v.SetDefault("scan_path", ".")
+	v.SetDefault("path", ".")
 	v.SetDefault("template", "")
 	v.SetDefault("workers", runtime.NumCPU())
 	v.SetDefault("redact", false)
 	v.SetDefault("reporter", "json")
 
-	// Rules and allowlist defaults
-	v.SetDefault("rules", convertGitleaksRules())
-	v.SetDefault("allowlist.paths", []string{})
-	v.SetDefault("allowlist.regexes", []string{})
-	v.SetDefault("allowlist.commits", []string{})
-
 	return &ConfigLoader{v: v}
 }
 
-func convertGitleaksRules() []pillager.Rule {
+func convertDefaultConfig() (*pillager.Options, error) {
 	var defaultConfig config.Config
+
 	if err := toml.Unmarshal([]byte(config.DefaultConfig), &defaultConfig); err != nil {
-		log.Fatal().Err(err).Msg("failed to parse default rules")
+		return nil, errors.Wrap(err, "failed to parse default rules")
 	}
 
-	var rules []pillager.Rule
-	for _, rule := range defaultConfig.Rules {
-		rules = append(rules, pillager.Rule{
-			ID:          rule.RuleID,
-			Description: rule.Description,
-			Regex:       rule.Regex.String(),
-			Tags:        rule.Tags,
-		})
-	}
+	var opts pillager.Options
 
-	return rules
+	opts.Rules = gitleaksToPillagerRules(defaultConfig.Rules)
+	opts.Allowlist = gitleaksToPillagerAllowlist(defaultConfig.Allowlist)
+
+	return &opts, nil
 }
 
 // LoadConfig attempts to load configuration from a file
 func (c *ConfigLoader) LoadConfig(configPath string) (*pillager.Options, error) {
+
+	// Rules and allowlist defaults
+	defaultConfig, err := convertDefaultConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert default rules")
+	}
+
+	c.v.SetDefault("rules", defaultConfig.Rules)
+	c.v.SetDefault("allowlist.paths", defaultConfig.Allowlist.Paths)
+	c.v.SetDefault("allowlist.regexes", defaultConfig.Allowlist.Regexes)
+
 	if configPath != "" {
 		// Use specified config file
 		ext := filepath.Ext(configPath)
-		if ext == "" {
-			return nil, fmt.Errorf("config file must have an extension (.yaml, .toml, or .json)")
+		if ext != ".toml" {
+			return nil, fmt.Errorf("config file must have an extension .toml")
 		}
 		c.v.SetConfigType(ext[1:])
 		c.v.SetConfigFile(configPath)
@@ -74,23 +75,22 @@ func (c *ConfigLoader) LoadConfig(configPath string) (*pillager.Options, error) 
 		c.v.SetConfigName("pillager")
 		c.v.AddConfigPath(".")
 		c.v.AddConfigPath("$HOME/.pillager")
-		c.v.AddConfigPath("/etc/pillager/")
+		c.v.AddConfigPath("$HOME/.config/pillager")
 
 		c.v.ReadInConfig()
 	}
 
 	// Create options from config
 	opts := &pillager.Options{
+		Path:     c.v.GetString("path"),
 		Workers:  c.v.GetInt("workers"),
 		Verbose:  c.v.GetBool("verbose"),
 		Template: c.v.GetString("template"),
 		Redact:   c.v.GetBool("redact"),
 		Reporter: c.v.GetString("reporter"),
-		Rules:    c.v.Get("rules").([]pillager.Rule),
 		Allowlist: pillager.Allowlist{
 			Paths:   c.v.GetStringSlice("allowlist.paths"),
 			Regexes: c.v.GetStringSlice("allowlist.regexes"),
-			Commits: c.v.GetStringSlice("allowlist.commits"),
 		},
 	}
 
@@ -121,8 +121,8 @@ func (c *ConfigLoader) MergeWithFlags(opts *pillager.Options, flags *pillager.Op
 	if flags.Template != "" {
 		opts.Template = flags.Template
 	}
-	if flags.ScanPath != "" {
-		opts.ScanPath = flags.ScanPath
+	if flags.Path != "" {
+		opts.Path = flags.Path
 	}
 	// Merge rules if provided
 	if len(flags.Rules) > 0 {
@@ -134,8 +134,5 @@ func (c *ConfigLoader) MergeWithFlags(opts *pillager.Options, flags *pillager.Op
 	}
 	if len(flags.Allowlist.Regexes) > 0 {
 		opts.Allowlist.Regexes = flags.Allowlist.Regexes
-	}
-	if len(flags.Allowlist.Commits) > 0 {
-		opts.Allowlist.Commits = flags.Allowlist.Commits
 	}
 }

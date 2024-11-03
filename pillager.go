@@ -27,30 +27,29 @@ type Finding struct {
 
 // Options holds configuration for scanners
 type Options struct {
-	ScanPath  string
-	Template  string
-	Workers   int
-	Verbose   bool
-	Redact    bool
-	Reporter  string
-	Rules     []Rule
-	Allowlist Allowlist
+	Path      string    `toml:"path"`
+	Template  string    `toml:"template"`
+	Workers   int       `toml:"workers"`
+	Verbose   bool      `toml:"verbose"`
+	Redact    bool      `toml:"redact"`
+	Reporter  string    `toml:"reporter"`
+	Rules     []Rule    `toml:"rules"`
+	Allowlist Allowlist `toml:"allowlist"`
 }
 
 // Rule represents a scanning rule
 type Rule struct {
-	ID          string
-	Description string
-	Path        string
-	Regex       string
-	Keywords    []string
-	Tags        []string
+	ID          string   `toml:"id"`
+	Description string   `toml:"description"`
+	Path        string   `toml:"path"`
+	Regex       string   `toml:"regex"`
+	Keywords    []string `toml:"keywords"`
+	Tags        []string `toml:"tags"`
 	Allowlist   Allowlist
 }
 
 // Allowlist represents paths and patterns to ignore
 type Allowlist struct {
-	Paths   []string
-	Regexes []string
-	Commits []string
+	Paths   []string `toml:"paths"`
+	Regexes []string `toml:"regexes"`
 }
