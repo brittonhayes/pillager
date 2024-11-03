@@ -1,0 +1,44 @@
+# Basic configuration
+verbose = false 
+path = "."
+workers = 4
+redact = true
+reporter = "json-pretty"
+
+# Rules for secret detection
+[[rules]]
+description = "AWS Access Key"
+id = "aws-access-key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["aws", "credentials"]
+
+[[rules]]
+description = "AWS Secret Key"
+id = "aws-secret-key"
+regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["aws", "credentials"]
+
+[[rules]]
+description = "GitHub Token"
+id = "github-token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+tags = ["github", "token"]
+
+[[rules]]
+description = "Private Key"
+id = "private-key"
+regex = '''-----BEGIN (?:RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY( BLOCK)?-----'''
+tags = ["key", "private"]
+
+# Allowlist configuration
+[allowlist]
+paths = [
+    ".*/_test\\.go$",
+    ".*/testdata/.*",
+    ".*\\.md$",
+    ".*/vendor/.*"
+]
+regexes = [
+    "EXAMPLE_KEY",
+    "DUMMY_SECRET"
+] 
