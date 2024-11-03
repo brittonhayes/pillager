@@ -28,7 +28,7 @@ matches. The available pattern filters can be defined in a pillager.toml file or
 
 ### Go
 
-If you have Go setup on your system, you can install Pillager with `go get`
+If you have Go setup on your system, you can install Pillager with `go install`
 
 ```shell script
 go install github.com/brittonhayes/pillager@latest
