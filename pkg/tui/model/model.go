@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/brittonhayes/pillager/pkg/hunter"
+	"github.com/brittonhayes/pillager"
+	"github.com/brittonhayes/pillager/internal/scanner"
 	"github.com/brittonhayes/pillager/pkg/tui/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/evertras/bubble-table/table"
-	"github.com/zricethezav/gitleaks/v8/report"
 	"golang.org/x/term"
 )
 
@@ -22,8 +22,8 @@ type model struct {
 	help    help.Model
 	table   table.Model
 
-	hunter  *hunter.Hunter
-	results []report.Finding
+	scanner *scanner.Scanner
+	results []pillager.Finding
 	err     error
 
 	width  int
@@ -51,7 +51,7 @@ type body struct {
 	message  string
 }
 
-type resultsMsg struct{ results []report.Finding }
+type resultsMsg struct{ results []pillager.Finding }
 
 type errMsg struct{ err error }
 
@@ -59,7 +59,7 @@ func (e errMsg) Error() string {
 	return fmt.Sprintf("🔥 Uh oh! Well that's not good. Looks like something went wrong and the application has exited: \n\n%s\n\n%s", style.Error.Render(e.Error()), "Press [q] to quit.")
 }
 
-func NewModel(hunt *hunter.Hunter) model {
+func NewModel(scan *scanner.Scanner) model {
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		width = 80
@@ -76,7 +76,7 @@ func NewModel(hunt *hunter.Hunter) model {
 	h := help.New()
 
 	m := model{
-		hunter: hunt,
+		scanner: scan,
 		header: header{
 			title:    "Pillager",
 			subtitle: "Hunt inside the file system for valuable information",
@@ -102,11 +102,9 @@ func (m model) Dimensions() (int, int) {
 	return m.width, m.height
 }
 
-func startScan(h *hunter.Hunter) tea.Cmd {
+func startScan(s scanner.Scanner, path string) tea.Cmd {
 	return func() tea.Msg {
-		h.Debug = false
-		h.Verbose = false
-		results, err := h.Hunt()
+		results, err := s.Scan(path)
 		if err != nil {
 			// There was an error making our request. Wrap the error we received
 			// in a message and return it.

@@ -1,10 +1,19 @@
-// Package pillager is the entrypoint to the Pillager CLI
 package main
 
 import (
-	pillager "github.com/brittonhayes/pillager/internal/commands"
+	"os"
+
+	"github.com/brittonhayes/pillager/internal/commands"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
+func init() {
+	// Setup default logging
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+}
+
 func main() {
-	pillager.Execute()
+	commands.Execute()
 }

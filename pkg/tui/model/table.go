@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/tui/style"
 	"github.com/evertras/bubble-table/table"
-	"github.com/zricethezav/gitleaks/v8/report"
 )
 
 const (
@@ -35,7 +35,7 @@ func newTable(width int) table.Model {
 	return t
 }
 
-func addRowData(data []report.Finding) []table.Row {
+func addRowData(data []pillager.Finding) []table.Row {
 	rows := []table.Row{}
 
 	for i, entry := range data {
