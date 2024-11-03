@@ -7,6 +7,5 @@ linters:
     - funlen
     - gocritic
     - goprintffuncname
-    - ifshort
   presets:
     - unused
