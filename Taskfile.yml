@@ -17,8 +17,8 @@ tasks:
     cmds:
       - rm bin/pillager
       - go clean -cache
-      - rm -rf pkg/hunter/testdata
-      - mkdir pkg/hunter/testdata
+      - rm -rf pkg/pillager/testdata
+      - mkdir pkg/pillager/testdata
 
   lint:
     desc: runs golint

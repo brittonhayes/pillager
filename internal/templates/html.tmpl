@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pillager - Scan Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #191919;
+            --bg-secondary: #202020;
+            --text-primary: #E6E6E6;
+            --text-secondary: #999999;
+            --border-color: #303030;
+            --accent-color: #2E3440;
+            --danger-color: #BF616A;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .section {
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .title {
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .finding-card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .file-path {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .tag {
+            background-color: var(--accent-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .secret {
+            color: var(--danger-color);
+            font-family: monospace;
+            background-color: var(--bg-primary);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            word-break: break-all;
+        }
+
+        .metadata {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .json-view {
+            cursor: pointer;
+            color: var(--text-secondary);
+            text-decoration: underline;
+            font-size: 0.8rem;
+        }
+
+        .json-view:hover {
+            color: var(--text-primary);
+        }
+
+        .json-content {
+            display: none;
+            background-color: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .finding-card.expanded {
+            grid-column: 1 / -1; /* Makes the card span full width when expanded */
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title">
+            Pillager
+        </h1>
+        <p class="subtitle">
+            Results of your latest hunt from {{ now.Format "2006-01-02 15:04 MST" }}
+        </p>
+
+        <div class="findings-grid">
+            {{ range . }}
+                <div class="finding-card">
+                    <div class="file-path">{{.File}}</div>
+                    <div class="secret">{{.Secret}}</div>
+                    <div class="metadata">
+                        <span class="json-view" onclick="toggleJson(this)" data-json="{{. | json }}">View JSON</span>
+                        <span>Line: {{.StartLine}}</span>
+                    </div>
+                    <div class="json-content"></div>
+                </div>
+            {{end}}
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleJson(element) {
+        const card = element.closest('.finding-card');
+        const jsonContent = card.querySelector('.json-content');
+        
+        if (jsonContent.style.display === 'none' || !jsonContent.style.display) {
+            const jsonData = JSON.parse(element.getAttribute('data-json'));
+            jsonContent.textContent = JSON.stringify(jsonData, null, 2);
+            jsonContent.style.display = 'block';
+            card.classList.add('expanded');
+            element.textContent = 'Hide JSON';
+        } else {
+            jsonContent.style.display = 'none';
+            card.classList.remove('expanded');
+            element.textContent = 'View JSON';
+        }
+    }
+</script>
+</body>
+</html>

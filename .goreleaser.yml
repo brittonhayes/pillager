@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -15,13 +17,6 @@ builds:
       - -X main.builtBy=goreleaser
     main: "./cmd/pillager"
 
-archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
 checksum:
   name_template: "checksums.txt"
 snapshot:
@@ -34,60 +29,31 @@ changelog:
       - "^test:"
       - "^images:"
       - "^_examples:"
-scoop:
-  # Template for the url which is determined by the given Token (github or gitlab)
-  url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
-  # Repository to push the app manifest to.
-  bucket:
-    owner: brittonhayes
-    name: pillager-scoop
-
-  commit_author:
-    name: goreleaserbot
-    email: goreleaser@carlosbecker.com
-
-  # The project name and current git tag are used in the format string.
-  commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-
-  # Your app's description.
-  # Default is empty.
-  description: "Pillage filesystems for sensitive information"
-
-  # Your app's license
-  # Default is empty.
-  license: MIT
-
-brews:
-  - # Name template of the recipe
-    # Default to project name
-    name: pillager
-
-    # GOARM to specify which 32-bit arm version to use if there are multiple versions
-    # from the build section. Brew formulas support atm only one 32-bit version.
-    # Default is 6 for all artifacts or each id if there a multiple versions.
-    goarm: "6"
-
-    # GitHub/GitLab repository to push the formula to
-    # Gitea is not supported yet, but the support coming
-    tap:
+scoops:
+  - name: pillager
+    repository:
       owner: brittonhayes
-      name: homebrew-pillager
-
+      name: pillager-scoop
     url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-
-    # Git author used to commit to the repository.
-    # Defaults are shown.
     commit_author:
       name: goreleaserbot
       email: goreleaser@carlosbecker.com
-
-    # Your app's homepage.
-    # Default is empty.
+    commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
+    description: "Pillage filesystems for sensitive information"
+    license: MIT
     homepage: "https://github.com/brittonhayes/pillager"
 
-    # Your app's description.
-    # Default is empty.
+brews:
+  - name: pillager
+    goarm: "6"
+    repository:
+      owner: brittonhayes
+      name: homebrew-pillager
+    url_template: "https://github.com/brittonhayes/pillager/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    homepage: "https://github.com/brittonhayes/pillager"
     description: "Pillage filesystems for sensitive information"
-
     license: "MIT"
