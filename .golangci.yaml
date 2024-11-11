@@ -1,14 +1,11 @@
 linters:
   enable:
-    - gofumpt
     - gofmt
     - gosimple
-    - godot
     - godox
     - dupl
     - funlen
     - gocritic
     - goprintffuncname
-    - ifshort
   presets:
     - unused
