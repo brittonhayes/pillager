@@ -147,12 +147,6 @@ pillager hunt .
 pillager hunt ./example -f json | jq
 ```
 
-> _JSON output is designed to work seamlessly with the amazing [jq](https://github.com/stedolan/jq) utility for easy parsing._
-
-<details>
-<summary>Click to view more output formats</summary>
-<br>
-
 #### Wordlist
 
 ```shell
@@ -165,6 +159,12 @@ pillager hunt . -f wordlist
 pillager hunt ./ -f wordlist >> rockyou.txt && hashcat -a 0 hash.txt rockyou.txt
 ```
 
+> _JSON output is designed to work seamlessly with the amazing [jq](https://github.com/stedolan/jq) utility for easy parsing._
+
+<details>
+<summary>Click to view more output formats</summary>
+<br>
+
 #### JSON Pretty
 
 ```shell
@@ -175,12 +175,6 @@ pillager hunt . -f json-pretty
 
 ```shell
 pillager hunt . -f html > results.html
-```
-
-#### HTML Table
-
-```shell
-pillager hunt . -f html-table > results.html
 ```
 
 #### Markdown
