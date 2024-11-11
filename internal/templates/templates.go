@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	//go:embed simple.tmpl
-	Simple string
+	//go:embed wordlist.tmpl
+	Wordlist string
 
 	//go:embed html.tmpl
 	HTML string
@@ -17,9 +17,6 @@ var (
 
 	//go:embed table.tmpl
 	Table string
-
-	//go:embed html-table.tmpl
-	HTMLTable string
 )
 
 // DefaultTemplate is the base template used to format a Finding into the

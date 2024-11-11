@@ -89,7 +89,7 @@ in with a rules[^1] section in your pillager.toml file, or you can use the defau
 verbose = false 
 path = "."
 workers = 4
-redact = true
+redact = false 
 reporter = "json-pretty"
 
 # Rules for secret detection
@@ -153,10 +153,16 @@ pillager hunt ./example -f json | jq
 <summary>Click to view more output formats</summary>
 <br>
 
-#### YAML
+#### Wordlist
 
 ```shell
-pillager hunt . -f yaml
+# Use pillager to generate a new-line delimited wordlist from findings
+pillager hunt . -f wordlist 
+```
+
+```shell
+# Use pillager to append a wordlist and then use your favorite hashcat attack mode
+pillager hunt ./ -f wordlist >> rockyou.txt && hashcat -a 0 hash.txt rockyou.txt
 ```
 
 #### JSON Pretty

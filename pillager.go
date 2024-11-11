@@ -42,7 +42,7 @@ THE SOFTWARE.
 package pillager
 
 // Finding contains information about strings that
-// have been captured by a tree-sitter query.
+// have been captured by a scanner query.
 type Finding struct {
 	Description string
 	StartLine   int
@@ -50,10 +50,11 @@ type Finding struct {
 	StartColumn int
 	EndColumn   int
 
+	// Match is the full content of what is matched by the scanner.
 	Match string
 
 	// Secret contains the full content of what is matched in
-	// the tree-sitter query.
+	// the scanner query.
 	Secret string
 
 	// File is the name of the file containing the finding

@@ -2,7 +2,7 @@
 verbose = false 
 path = "."
 workers = 4
-redact = true
+redact = false 
 reporter = "json-pretty"
 
 # Rules for secret detection
