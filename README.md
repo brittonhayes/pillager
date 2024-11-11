@@ -147,6 +147,8 @@ pillager hunt .
 pillager hunt ./example -f json | jq
 ```
 
+> _JSON output is designed to work seamlessly with the amazing [jq](https://github.com/stedolan/jq) utility for easy parsing._
+
 #### Wordlist
 
 ```shell
@@ -158,8 +160,6 @@ pillager hunt . -f wordlist
 # Use pillager to append a wordlist and then use your favorite hashcat attack mode
 pillager hunt ./ -f wordlist >> rockyou.txt && hashcat -a 0 hash.txt rockyou.txt
 ```
-
-> _JSON output is designed to work seamlessly with the amazing [jq](https://github.com/stedolan/jq) utility for easy parsing._
 
 <details>
 <summary>Click to view more output formats</summary>
@@ -198,7 +198,7 @@ pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
 #### Custom Go Template from File
 
 ```shell
-pillager hunt . -t "$(cat internal/templates/simple.tmpl)"
+pillager hunt . -t "$(cat mytemplate.tmpl)"
 ```
 
 </details>
