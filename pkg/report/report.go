@@ -27,22 +27,16 @@ func StringToReporter(s string) Reporter {
 		return JSON{}
 	case "json-pretty":
 		return JSONPretty{}
-	case "raw":
-		return Raw{}
-	case "yaml":
-		return YAML{}
+	case "wordlist":
+		return Wordlist{}
 	case "table":
 		return Table{}
 	case "html":
 		return HTML{}
-	case "html-table":
-		return HTMLTable{}
 	case "markdown":
 		return Markdown{}
 	case "custom":
 		return Custom{}
-	case "simple":
-		return Simple{}
 	default:
 		return JSON{}
 	}

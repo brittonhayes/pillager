@@ -51,82 +51,39 @@
             margin-bottom: 2rem;
         }
 
-        .findings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .finding-card {
+        .table-container {
             background-color: var(--bg-secondary);
             border-radius: 8px;
-            padding: 1.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease;
-        }
-
-        .file-path {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            word-break: break-all;
-        }
-
-        .tag {
-            background-color: var(--accent-color);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            display: inline-block;
-        }
-
-        .secret {
-            color: var(--danger-color);
-            font-family: monospace;
-            background-color: var(--bg-primary);
-            padding: 0.5rem;
-            border-radius: 4px;
-            margin: 0.5rem 0;
-            word-break: break-all;
-        }
-
-        .metadata {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .json-view {
-            cursor: pointer;
-            color: var(--text-secondary);
-            text-decoration: underline;
-            font-size: 0.8rem;
-        }
-
-        .json-view:hover {
-            color: var(--text-primary);
-        }
-
-        .json-content {
-            display: none;
-            background-color: var(--bg-primary);
-            padding: 1rem;
-            border-radius: 4px;
-            margin-top: 1rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
             overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.9rem;
         }
 
-        .finding-card.expanded {
-            grid-column: 1 / -1; /* Makes the card span full width when expanded */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        thead th {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+
+        tbody tr:hover {
+            background-color: var(--accent-color);
+        }
+
+        .has-text-danger {
+            color: var(--danger-color);
         }
 
         @media (max-width: 768px) {
@@ -138,9 +95,33 @@
                 font-size: 1.1rem;
             }
             
-            .findings-grid {
-                grid-template-columns: 1fr;
+            th, td {
+                padding: 0.75rem;
             }
+        }
+
+        details {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        summary {
+            padding: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        details[open] summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .file-count {
+            color: var(--text-secondary);
+            float: right;
         }
     </style>
 </head>
@@ -150,43 +131,45 @@
         <h1 class="title">
             Pillager
         </h1>
-        <p class="subtitle">
+        <h2 class="subtitle">
             Results of your latest hunt from {{ now.Format "2006-01-02 15:04 MST" }}
-        </p>
-
-        <div class="findings-grid">
-            {{ range . }}
-                <div class="finding-card">
-                    <div class="file-path">{{.File}}</div>
-                    <div class="secret">{{.Secret}}</div>
-                    <div class="metadata">
-                        <span class="json-view" onclick="toggleJson(this)" data-json="{{. | json }}">View JSON</span>
-                        <span>Line: {{.StartLine}}</span>
-                    </div>
-                    <div class="json-content"></div>
+        </h2>
+        
+        {{/* Group results by file using dict/values */}}
+        {{ $grouped := dict }}
+        {{ range . }}
+            {{ $findings := index $grouped .File | default list }}
+            {{ $grouped = set $grouped .File (append $findings .) }}
+        {{ end }}
+        
+        {{ range $file, $findings := $grouped }}
+            <details>
+                <summary>
+                    {{ $file }}
+                    <span class="file-count">{{ len $findings }} findings</span>
+                </summary>
+                <div class="table-container">
+                    <table class="table is-fullwidth">
+                        <thead>
+                        <tr>
+                            <th><abbr title="Line Number">Line</abbr></th>
+                            <th><abbr title="Secret">Secret</abbr></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{ range $findings }}
+                            <tr>
+                                <td>{{.StartLine}}</td>
+                                <td class="has-text-danger">{{.Secret}}</td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
                 </div>
-            {{end}}
-        </div>
+            </details>
+        {{ end }}
     </div>
 </section>
 
-<script>
-    function toggleJson(element) {
-        const card = element.closest('.finding-card');
-        const jsonContent = card.querySelector('.json-content');
-        
-        if (jsonContent.style.display === 'none' || !jsonContent.style.display) {
-            const jsonData = JSON.parse(element.getAttribute('data-json'));
-            jsonContent.textContent = JSON.stringify(jsonData, null, 2);
-            jsonContent.style.display = 'block';
-            card.classList.add('expanded');
-            element.textContent = 'Hide JSON';
-        } else {
-            jsonContent.style.display = 'none';
-            card.classList.remove('expanded');
-            element.textContent = 'View JSON';
-        }
-    }
-</script>
 </body>
 </html>
