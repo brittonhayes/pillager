@@ -34,27 +34,18 @@ var huntCmd = &cobra.Command{
 	Example: `
 	Basic:
 		pillager hunt .
-	
-	JSON Format:
-		pillager hunt ./example -f json
-	
-	YAML Format:
-		pillager hunt . -f yaml
+		
+	Wordlist Format:
+		pillager hunt . -f wordlist > results.txt
+
+	CSV Format:
+		pillager hunt . -f csv > results.csv
 	
 	HTML Format:
 		pillager hunt . -f html > results.html
-	
-	HTML Table Format:
-		pillager hunt . -f html-table > results.html
-	
-	Markdown Table Format:
-		pillager hunt . -f table > results.md
-	
+
 	Custom Go Template Format:
 		pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
-	
-	Custom Go Template Format from Template File:
-		pillager hunt ./example --template "$(cat pkg/templates/simple.tmpl)"
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts, err := setupConfig()
@@ -110,7 +101,7 @@ func init() {
 	huntCmd.Flags().StringVarP(&templ, "template", "t", "", "set go text/template string for output format")
 	huntCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "run in interactive mode")
 	huntCmd.Flags().BoolVarP(&dedupe, "dedupe", "d", false, "deduplicate results")
-	huntCmd.Flags().Float64VarP(&entropy, "entropy", "e", 4.0, "minimum entropy value for results")
+	huntCmd.Flags().Float64VarP(&entropy, "entropy", "e", 3.0, "minimum entropy value for results")
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
 
 	// Bind flags to viper
