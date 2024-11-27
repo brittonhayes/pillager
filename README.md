@@ -87,10 +87,7 @@ in with a rules[^1] section in your pillager.toml file, or you can use the defau
 # pillager.toml
 # Basic configuration
 verbose = false 
-path = "."
-workers = 4
 redact = false 
-reporter = "json-pretty"
 
 # Rules for secret detection
 [[rules]]
@@ -183,10 +180,10 @@ pillager hunt . -f html > results.html
 pillager hunt . -f markdown > results.md
 ```
 
-#### Markdown Table
+#### CSV 
 
 ```shell
-pillager hunt . -f table > results.md
+pillager hunt . -f csv > results.csv
 ```
 
 #### Custom Go Template

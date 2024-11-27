@@ -14,9 +14,6 @@ var (
 
 	//go:embed markdown.tmpl
 	Markdown string
-
-	//go:embed table.tmpl
-	Table string
 )
 
 // DefaultTemplate is the base template used to format a Finding into the

@@ -16,13 +16,15 @@ import (
 // GitleaksScanner implements the Scanner interface using gitleaks
 type GitleaksScanner struct {
 	detector *detect.Detector
-	reporter string
+	format   string
+	dedupe   bool
+	entropy  float32
 }
 
 // NewGitleaksScanner creates a new scanner using gitleaks
 func NewGitleaksScanner(options pillager.Options) (Scanner, error) {
 	scanner := &GitleaksScanner{
-		reporter: options.Reporter,
+		format: options.Format,
 	}
 
 	cfg := config.Config{
@@ -34,13 +36,15 @@ func NewGitleaksScanner(options pillager.Options) (Scanner, error) {
 	scanner.detector = detect.NewDetector(cfg)
 	scanner.detector.Verbose = options.Verbose
 	scanner.detector.Redact = options.Redact
+	scanner.dedupe = options.Dedup
+	scanner.entropy = float32(options.Entropy)
 
 	return scanner, nil
 }
 
 // Reporter returns the reporter for the scanner
 func (g *GitleaksScanner) Reporter() report.Reporter {
-	return report.StringToReporter(g.reporter)
+	return report.StringToReporter(g.format)
 }
 
 // ScanPath returns the path that the scanner is scanning
@@ -59,7 +63,6 @@ func (g *GitleaksScanner) Translate(f output.Finding) pillager.Finding {
 		Secret:      f.Secret,
 		File:        f.File,
 		Entropy:     f.Entropy,
-		RuleID:      f.RuleID,
 	}
 	return finding
 }
@@ -73,11 +76,18 @@ func (g *GitleaksScanner) Scan() ([]pillager.Finding, error) {
 
 	var pillagerFindings []pillager.Finding
 	for _, f := range findings {
+		if f.Entropy < g.entropy {
+			continue
+		}
 		pillagerFindings = append(pillagerFindings, g.Translate(f))
 	}
 
 	if len(pillagerFindings) == 0 {
 		return pillagerFindings, nil
+	}
+
+	if g.dedupe {
+		pillagerFindings = DedupFindings(pillagerFindings)
 	}
 
 	return pillagerFindings, nil
@@ -123,7 +133,10 @@ func gitleaksToPillagerAllowlist(a config.Allowlist) pillager.Allowlist {
 		regexes = append(regexes, regex.String())
 	}
 
-	return pillager.Allowlist{Paths: paths, Regexes: regexes}
+	stopWords := []string{}
+	stopWords = append(stopWords, a.StopWords...)
+
+	return pillager.Allowlist{Paths: paths, Regexes: regexes, StopWords: stopWords}
 }
 
 func gitleaksToPillagerRules(rules []*config.Rule) []pillager.Rule {

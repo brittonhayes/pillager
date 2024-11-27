@@ -8,24 +8,22 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/scanner"
 	"github.com/brittonhayes/pillager/pkg/tui/model"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
-	verbose     bool
+	dedupe      bool
+	entropy     float64
+	format      string
 	redact      bool
-	level       string
-	reporter    string
 	templ       string
-	workers     int
 	interactive bool
-	config      string
+	workers     int
 )
 
 // huntCmd represents the hunt command.
@@ -36,68 +34,29 @@ var huntCmd = &cobra.Command{
 	Example: `
 	Basic:
 		pillager hunt .
-	
-	JSON Format:
-		pillager hunt ./example -f json
-	
-	YAML Format:
-		pillager hunt . -f yaml
+		
+	Wordlist Format:
+		pillager hunt . -f wordlist > results.txt
+
+	CSV Format:
+		pillager hunt . -f csv > results.csv
 	
 	HTML Format:
 		pillager hunt . -f html > results.html
-	
-	HTML Table Format:
-		pillager hunt . -f html-table > results.html
-	
-	Markdown Table Format:
-		pillager hunt . -f table > results.md
-	
+
 	Custom Go Template Format:
 		pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
-	
-	Custom Go Template Format from Template File:
-		pillager hunt ./example --template "$(cat pkg/templates/simple.tmpl)"
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if level != "" {
-			lvl, err := zerolog.ParseLevel(level)
-			if err != nil {
-				return fmt.Errorf("invalid log level: %w", err)
-			}
-			zerolog.SetGlobalLevel(lvl)
-		}
-
-		configLoader := scanner.NewConfigLoader()
-		opts, err := configLoader.LoadConfig(config)
+		opts, err := setupConfig()
 		if err != nil {
-			if config != "" {
-				return fmt.Errorf("failed to load config: %w", err)
-			}
-			opts = &pillager.Options{
-				Workers:  runtime.NumCPU(),
-				Verbose:  false,
-				Template: "",
-				Redact:   false,
-				Reporter: "json",
-			}
+			return err
 		}
 
-		// Get path from args if provided, otherwise use config path
-		scanPath := ""
+		// Get path from args if provided
 		if len(args) > 0 {
-			scanPath = args[0]
+			opts.Path = args[0]
 		}
-
-		// Merge command line flags with config file
-		flagOpts := &pillager.Options{
-			Path:     scanPath,
-			Redact:   redact,
-			Verbose:  verbose,
-			Workers:  workers,
-			Reporter: reporter,
-			Template: templ,
-		}
-		configLoader.MergeWithFlags(opts, flagOpts)
 
 		// Check if path is provided either via args or config
 		if opts.Path == "" {
@@ -136,12 +95,20 @@ func runInteractive(h scanner.Scanner) error {
 
 func init() {
 	rootCmd.AddCommand(huntCmd)
-	huntCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "run in interactive mode")
-	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
-	huntCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable scanner verbose output")
-	huntCmd.Flags().StringVarP(&level, "log-level", "l", "info", "set logging level")
-	huntCmd.Flags().StringVarP(&config, "config", "c", "", "path to pillager config file")
-	huntCmd.Flags().StringVarP(&reporter, "format", "f", "json-pretty", "set secret reporter format (json, yaml, html, html-table, table, markdown)")
+
+	huntCmd.Flags().StringVarP(&format, "format", "f", "json", "set secret reporter format")
 	huntCmd.Flags().BoolVar(&redact, "redact", false, "redact secret from results")
 	huntCmd.Flags().StringVarP(&templ, "template", "t", "", "set go text/template string for output format")
+	huntCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "run in interactive mode")
+	huntCmd.Flags().BoolVarP(&dedupe, "dedupe", "d", false, "deduplicate results")
+	huntCmd.Flags().Float64VarP(&entropy, "entropy", "e", 3.0, "minimum entropy value for results")
+	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
+
+	// Bind flags to viper
+	viper.BindPFlag("dedupe", huntCmd.Flags().Lookup("dedupe"))
+	viper.BindPFlag("entropy", huntCmd.Flags().Lookup("entropy"))
+	viper.BindPFlag("format", huntCmd.Flags().Lookup("format"))
+	viper.BindPFlag("redact", huntCmd.Flags().Lookup("redact"))
+	viper.BindPFlag("template", huntCmd.Flags().Lookup("template"))
+	viper.BindPFlag("workers", huntCmd.Flags().Lookup("workers"))
 }
