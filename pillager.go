@@ -62,9 +62,6 @@ type Finding struct {
 
 	// Entropy is the shannon entropy of Value
 	Entropy float32
-
-	// Rule is the name of the rule that was matched
-	RuleID string
 }
 
 // Options holds configuration for scanners
@@ -74,24 +71,27 @@ type Options struct {
 	Workers   int       `toml:"workers"`
 	Verbose   bool      `toml:"verbose"`
 	Redact    bool      `toml:"redact"`
-	Reporter  string    `toml:"reporter"`
+	Format    string    `toml:"format"`
+	Dedup     bool      `toml:"dedup"`
+	Entropy   float64   `toml:"entropy"`
 	Rules     []Rule    `toml:"rules"`
 	Allowlist Allowlist `toml:"allowlist"`
 }
 
 // Rule represents a scanning rule
 type Rule struct {
-	ID          string   `toml:"id"`
-	Description string   `toml:"description"`
-	Path        string   `toml:"path"`
-	Regex       string   `toml:"regex"`
-	Keywords    []string `toml:"keywords"`
-	Tags        []string `toml:"tags"`
+	ID          string   `toml:"id" json:"id"`
+	Description string   `toml:"description" json:"description"`
+	Path        string   `toml:"path" json:"path"`
+	Regex       string   `toml:"regex" json:"regex"`
+	Keywords    []string `toml:"keywords" json:"keywords"`
+	Tags        []string `toml:"tags" json:"tags"`
 	Allowlist   Allowlist
 }
 
 // Allowlist represents paths and patterns to ignore
 type Allowlist struct {
-	Paths   []string `toml:"paths"`
-	Regexes []string `toml:"regexes"`
+	Paths     []string `toml:"paths"`
+	Regexes   []string `toml:"regexes"`
+	StopWords []string `toml:"stopwords"`
 }

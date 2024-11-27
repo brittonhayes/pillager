@@ -29,12 +29,12 @@ func StringToReporter(s string) Reporter {
 		return JSONPretty{}
 	case "wordlist":
 		return Wordlist{}
-	case "table":
-		return Table{}
 	case "html":
 		return HTML{}
 	case "markdown":
 		return Markdown{}
+	case "csv":
+		return CSV{}
 	case "custom":
 		return Custom{}
 	default:

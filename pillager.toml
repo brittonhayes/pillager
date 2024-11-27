@@ -1,9 +1,7 @@
 # Basic configuration
 verbose = false 
-path = "."
-workers = 4
 redact = false 
-reporter = "json-pretty"
+format = "json-pretty"
 
 # Rules for secret detection
 [[rules]]
@@ -23,22 +21,3 @@ description = "GitHub Token"
 id = "github-token"
 regex = '''ghp_[0-9a-zA-Z]{36}'''
 tags = ["github", "token"]
-
-[[rules]]
-description = "Private Key"
-id = "private-key"
-regex = '''-----BEGIN (?:RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY( BLOCK)?-----'''
-tags = ["key", "private"]
-
-# Allowlist configuration
-[allowlist]
-paths = [
-    ".*/_test\\.go$",
-    ".*/testdata/.*",
-    ".*\\.md$",
-    ".*/vendor/.*"
-]
-regexes = [
-    "EXAMPLE_KEY",
-    "DUMMY_SECRET"
-] 
