@@ -65,7 +65,7 @@ aurs:
     maintainers:
       - "brittonhayes <brittonhayes@users.noreply.github.com>"
     license: "MIT"
-    private_key: "{{ .Env.AUR_KEY }}"
+    private_key: "~/.ssh/aur"
     git_url: "ssh://aur@aur.archlinux.org/pillager-bin.git"
     provides:
       - pillager
