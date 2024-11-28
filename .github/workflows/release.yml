@@ -24,6 +24,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.21
+      - name: Set up SSH key for AUR
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AUR_KEY }}" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          eval $(ssh-agent)
+          ssh-add ~/.ssh/aur
       - name: Run GoReleaser 
         uses: goreleaser/goreleaser-action@v6
         with:
