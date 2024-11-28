@@ -32,6 +32,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
+          AUR_KEY: ${{ secrets.AUR_KEY }}
 
   build-and-push-image:
     runs-on: ubuntu-latest
