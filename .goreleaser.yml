@@ -57,26 +57,3 @@ brews:
     homepage: "https://github.com/brittonhayes/pillager"
     description: "Pillage filesystems for sensitive information"
     license: "MIT"
-
-aurs:
-  - name: pillager-bin
-    homepage: "https://github.com/brittonhayes/pillager"
-    description: "Pillage filesystems for sensitive information"
-    maintainers:
-      - "brittonhayes <brittonhayes@users.noreply.github.com>"
-    license: "MIT"
-    private_key: "/home/runner/.ssh/aur"
-    git_url: "ssh://aur@aur.archlinux.org/pillager-bin.git"
-    provides:
-      - pillager
-    package: |-
-      # bin
-      install -Dm755 "./pillager" "${pkgdir}/usr/bin/pillager"
-      
-      # license
-      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/pillager/LICENSE"
-    commit_author:
-      name: "brittonhayes"
-      email: "brittonhayes@users.noreply.github.com"
-    commit_msg_template: "Update to {{ .Tag }}"
-    goamd64: v1
