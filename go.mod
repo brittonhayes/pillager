@@ -3,7 +3,7 @@ module github.com/brittonhayes/pillager
 go 1.21
 
 require (
-	github.com/BurntSushi/toml v1.1.0
+	github.com/BurntSushi/toml v1.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/brittonhayes/glitter v0.2.0
 	github.com/charmbracelet/bubbles v0.10.3
@@ -18,7 +18,6 @@ require (
 	github.com/spf13/viper v1.11.0
 	github.com/zricethezav/gitleaks/v8 v8.8.4
 	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -64,5 +63,6 @@ require (
 	golang.org/x/text v0.3.8 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
