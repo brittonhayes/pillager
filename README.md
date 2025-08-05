@@ -48,6 +48,14 @@ brew tap brittonhayes/homebrew-pillager
 brew install pillager
 ```
 
+### X-CMD
+
+If you're an [x-cmd](https://x-cmd.com/install/pillager) user, you can install it with the following command:
+
+```shell
+x install pillager
+```
+
 ### Docker Image
 
 ```
