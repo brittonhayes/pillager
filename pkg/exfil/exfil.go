@@ -52,7 +52,6 @@ type WebhookOptions struct {
 // SliverOptions holds Sliver C2-specific exfiltration configuration.
 type SliverOptions struct {
 	ConfigPath       string
-	SessionID        *string
 	LootName         *string
 	LootType         *string
 	ParseCredentials *bool

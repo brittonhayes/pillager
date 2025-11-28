@@ -26,7 +26,6 @@ tags = ["github", "token"]
 # Uncomment to enable automatic exfiltration to Sliver loot and credential stores
 # [exfil.sliver]
 # config_path = "~/.sliver-client/configs/operator.cfg"
-# session_id = ""  # Leave empty for no session association
 # loot_name = "pillager-scan"
-# loot_type = "credentials"
+# loot_type = "file"
 # parse_credentials = true
