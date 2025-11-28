@@ -10,6 +10,14 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    # Exclude 32-bit architectures to avoid integer overflow issues
+    # with dependencies and focus on modern systems
+    ignore:
+      - goos: windows
+        goarch: arm64
     ldflags:
       - -s -w -X github.com/brittonhayes/pillager/internal/commands/version.version={{.Version}}
       - -X main.commit={{.Commit}}
@@ -20,7 +28,7 @@ builds:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
@@ -44,7 +52,7 @@ scoops:
     license: MIT
     homepage: "https://github.com/brittonhayes/pillager"
 
-brews:
+homebrew:
   - name: pillager
     goarm: "6"
     repository:
