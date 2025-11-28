@@ -63,6 +63,8 @@ func (g *GitleaksScanner) Translate(f output.Finding) pillager.Finding {
 		Secret:      f.Secret,
 		File:        f.File,
 		Entropy:     f.Entropy,
+		RuleID:      f.RuleID,
+		Tags:        f.Tags,
 	}
 	return finding
 }

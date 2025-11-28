@@ -62,6 +62,12 @@ type Finding struct {
 
 	// Entropy is the shannon entropy of Value
 	Entropy float32
+
+	// RuleID is the ID of the rule that matched
+	RuleID string
+
+	// Tags are the tags associated with the rule
+	Tags []string
 }
 
 // Options holds configuration for scanners

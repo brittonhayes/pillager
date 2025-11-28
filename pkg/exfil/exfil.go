@@ -17,31 +17,45 @@ import (
 )
 
 // Exfiltrator defines the interface for exfiltrating findings to external destinations.
-//
-// WARNING: This interface is designed for AUTHORIZED SECURITY TESTING ONLY.
-// Unauthorized use may violate the Computer Fraud and Abuse Act (CFAA) and similar laws.
 type Exfiltrator interface {
-	// Exfiltrate sends findings to the configured destination.
 	Exfiltrate(ctx context.Context, findings []pillager.Finding) error
-
-	// Close cleanly shuts down the exfiltrator.
 	Close() error
 }
 
 // Config holds configuration for an exfiltrator instance.
 type Config struct {
-	// Type specifies the exfiltration channel (s3, webhook)
-	Type string
-
-	// EncryptionKey for client-side encryption (optional)
-	// Format: "env:VAR_NAME", "file:/path/to/key", or base64 key
+	Type          string
 	EncryptionKey string
+	Compress      bool
+	S3            *S3Options
+	Webhook       *WebhookOptions
+	Sliver        *SliverOptions
+}
 
-	// Compress enables gzip compression
-	Compress bool
+// S3Options holds S3-specific exfiltration configuration.
+type S3Options struct {
+	Bucket    string
+	Region    *string
+	Endpoint  *string
+	Prefix    *string
+	AccessKey *string
+	SecretKey *string
+}
 
-	// Options holds type-specific configuration
-	Options map[string]string
+// WebhookOptions holds webhook-specific exfiltration configuration.
+type WebhookOptions struct {
+	URL     string
+	Headers map[string]string
+	Timeout *time.Duration
+}
+
+// SliverOptions holds Sliver C2-specific exfiltration configuration.
+type SliverOptions struct {
+	ConfigPath       string
+	SessionID        *string
+	LootName         *string
+	LootType         *string
+	ParseCredentials *bool
 }
 
 // Metadata holds metadata about exfiltrated findings.
@@ -54,8 +68,8 @@ type Metadata struct {
 
 // Package holds findings with metadata for exfiltration.
 type Package struct {
-	Metadata Metadata            `json:"metadata"`
-	Findings []pillager.Finding  `json:"findings"`
+	Metadata Metadata           `json:"metadata"`
+	Findings []pillager.Finding `json:"findings"`
 }
 
 // Registry holds registered exfiltrator factories.
