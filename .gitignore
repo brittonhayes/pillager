@@ -12,6 +12,7 @@
 *.so
 *.dylib
 .task
+pillager
 # Test binary, built with `go test -c`
 *.test
 
