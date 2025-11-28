@@ -52,7 +52,7 @@ scoops:
     license: MIT
     homepage: "https://github.com/brittonhayes/pillager"
 
-homebrew:
+brews:
   - name: pillager
     goarm: "6"
     repository:
